@@ -35,6 +35,8 @@
       color-scheme: light;
     }
 
+    *{ box-sizing: border-box; }
+
     body{
       margin:0;
       background:var(--bg);
@@ -42,6 +44,7 @@
       font-family:var(--font);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden; /* prevent sideways cut-off */
     }
 
     .topbar{
@@ -67,7 +70,7 @@
       color:var(--text);
       border-radius: 999px;
       padding: 10px 12px;
-      font-weight: 800;
+      font-weight: 700;
       cursor:pointer;
       display:flex;
       align-items:center;
@@ -75,6 +78,7 @@
       transition: transform .06s ease, background .15s ease;
       user-select:none;
       -webkit-tap-highlight-color: transparent;
+      max-width: 100%;
     }
     .iconBtn:hover{ background: var(--btnHover); }
     .iconBtn:active{ transform: scale(.98); }
@@ -106,7 +110,7 @@
     }
     .nowTitle{
       font-size:16px;
-      font-weight:900;
+      font-weight:800;
       letter-spacing:.1px;
       max-width: 100%;
       overflow:hidden;
@@ -119,7 +123,7 @@
       padding: 4px 10px;
       border-radius: 999px;
       color: var(--muted);
-      font-weight: 800;
+      font-weight: 700;
       font-size: 12px;
     }
     .sub{
@@ -149,14 +153,16 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      gap: 14px;
+      gap: 12px;
       padding-top: 2px;
     }
+
+    /* Smaller play button, clearer border; you can also remove border entirely by setting border:none */
     .circleBtn{
-      width: 58px;
-      height: 58px;
+      width: 52px;
+      height: 52px;
       border-radius: 999px;
-      border: 1px solid var(--accentLine);
+      border: 2px solid color-mix(in oklab, var(--accentLine) 85%, white 15%);
       background: var(--accent);
       color: var(--text);
       display:flex;
@@ -166,14 +172,15 @@
       transition: transform .06s ease, filter .15s ease;
       user-select:none;
       -webkit-tap-highlight-color: transparent;
-      font-weight: 900;
+      font-weight: 800;
       font-size: 18px;
     }
     .circleBtn:hover{ filter: brightness(1.06); }
     .circleBtn:active{ transform: scale(.98); }
+
     .sideBtn{
-      width: 46px;
-      height: 46px;
+      width: 44px;
+      height: 44px;
       border-radius: 14px;
       border: 1px solid var(--line);
       background: var(--btn);
@@ -186,7 +193,7 @@
       -webkit-tap-highlight-color: transparent;
       transition: transform .06s ease, background .15s ease;
       font-size: 16px;
-      font-weight: 900;
+      font-weight: 800;
     }
     .sideBtn:hover{ background: var(--btnHover); }
     .sideBtn:active{ transform: scale(.98); }
@@ -199,7 +206,7 @@
       text-align:center;
       padding-top: 2px;
     }
-    .queue strong{ color: color-mix(in oklab, var(--text) 75%, var(--muted)); }
+    .queue strong{ color: color-mix(in oklab, var(--text) 75%, var(--muted)); font-weight: 700; }
     .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
 
     /* Drawer overlay */
@@ -219,20 +226,23 @@
       background: rgba(10,20,40,.30);
     }
 
-    /* Drawer uses fixed height + internal scrolling */
+    /* Fit drawer to viewport width so controls are always visible */
     .drawer{
       position:absolute;
       left: 0; right: 0;
       bottom: 0;
+      width: 100vw;              /* force fit */
+      max-width: 100vw;
       height: 86vh;
       background: var(--panel);
       border-top-left-radius: 22px;
       border-top-right-radius: 22px;
       border: 1px solid var(--line);
-      padding: 12px;
+      border-bottom: none;
+      padding: 10px;             /* a bit tighter */
       display:flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       transform: translateY(6px);
       overflow: hidden;
     }
@@ -244,43 +254,71 @@
       gap: 10px;
       padding: 2px 2px 0;
       flex: 0 0 auto;
+      min-width: 0;
     }
     .drawerTop h2{
       margin:0;
-      font-size: 14px;
-      font-weight: 950;
+      font-size: 13px;
+      font-weight: 800;
       letter-spacing:.1px;
     }
 
     .drawerControls{
       display:grid;
-      gap: 10px;
+      gap: 8px;
       flex: 0 0 auto;
     }
 
     .row{
       display:flex;
-      gap: 10px;
-      flex-wrap:wrap;
+      gap: 8px;
       align-items:center;
+      flex-wrap: nowrap;       /* keep the 3 dropdowns on one row */
+      min-width: 0;
     }
+
+    /* Smaller search + fonts */
     input[type="search"], select{
-      padding: 11px 12px;
-      border-radius: 14px;
+      padding: 9px 10px;
+      border-radius: 12px;
       border: 1px solid var(--line);
       background: color-mix(in oklab, var(--panel) 85%, var(--btn) 15%);
       color: var(--text);
       outline:none;
-      font-weight: 750;
-      font-size: 13px;
+      font-weight: 600;
+      font-size: 12px;
+      min-width: 0;
     }
-    input[type="search"]{ flex:1; min-width: 180px; }
-    select{ flex:0 0 auto; }
+    input[type="search"]{
+      width: 100%;
+    }
 
-    /* Scrollable list area */
+    /* Equal-width dropdowns that fit on one row */
+    select{
+      flex: 1 1 0;
+      width: 0;                /* makes flex sizing behave consistently */
+      max-width: none;
+      appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+        linear-gradient(135deg, var(--muted) 50%, transparent 50%),
+        linear-gradient(to right, transparent, transparent);
+      background-position:
+        calc(100% - 16px) calc(50% - 3px),
+        calc(100% - 11px) calc(50% - 3px),
+        0 0;
+      background-size:
+        5px 5px,
+        5px 5px,
+        100% 100%;
+      background-repeat: no-repeat;
+      padding-right: 26px;
+    }
+
+    /* Scrollable list */
     .list{
       flex: 1 1 auto;
-      min-height: 0;                 /* critical for scrolling in flex layouts */
+      min-height: 0;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       display:grid;
@@ -292,7 +330,7 @@
       border: 1px solid var(--line);
       background: var(--card);
       border-radius: var(--radius2);
-      padding: 10px 12px;
+      padding: 9px 10px;
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -305,10 +343,11 @@
     .item:hover{ background: color-mix(in oklab, var(--card) 70%, var(--btn) 30%); }
     .item:active{ transform: scale(.995); }
 
+    /* NO BOLD IN LIST */
     .itemTitle{
       margin:0;
-      font-weight: 900;
-      font-size: 13px;
+      font-weight: 500;
+      font-size: 12px;
       overflow:hidden;
       text-overflow:ellipsis;
       white-space:nowrap;
@@ -317,19 +356,29 @@
     }
     .itemMeta{
       color: var(--muted);
-      font-size: 12px;
+      font-size: 11px;
       display:flex;
       gap: 8px;
       align-items:center;
       flex: 0 0 auto;
       white-space:nowrap;
+      font-weight: 500;
+    }
+    .pillInList{
+      border: 1px solid var(--line);
+      background: var(--card);
+      padding: 3px 8px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 11px;
     }
 
     .mini{
       border-top:1px solid var(--line);
-      padding-top: 10px;
+      padding-top: 8px;
       display:grid;
-      gap: 8px;
+      gap: 6px;
       flex: 0 0 auto;
     }
     .miniTop{
@@ -337,10 +386,11 @@
       align-items:center;
       justify-content:space-between;
       gap: 10px;
+      min-width:0;
     }
     .miniTitle{
-      font-size: 12.5px;
-      font-weight: 950;
+      font-size: 12px;
+      font-weight: 650;
       overflow:hidden;
       text-overflow:ellipsis;
       white-space:nowrap;
@@ -353,14 +403,24 @@
       background:var(--btn);
       color:var(--text);
       border-radius: 12px;
-      padding: 10px 12px;
-      font-weight: 950;
+      padding: 9px 10px;
+      font-weight: 650;
       cursor:pointer;
       user-select:none;
       -webkit-tap-highlight-color: transparent;
-      font-size: 13px;
+      font-size: 12px;
     }
     .miniBtn:hover{ background: var(--btnHover); }
+
+    /* Make the drawer and controls extra safe on tiny screens */
+    @media (max-width: 360px){
+      .iconBtn span:last-child{ display:none; } /* hide "List/Theme/Player" text */
+      .circleBtn{ width: 48px; height: 48px; font-size: 17px; }
+      .sideBtn{ width: 42px; height: 42px; }
+      .drawer{ padding: 8px; }
+      select, input[type="search"]{ font-size: 11px; padding: 8px 9px; border-radius: 11px; }
+      .itemTitle{ font-size: 11px; }
+    }
   </style>
 </head>
 <body>
@@ -425,7 +485,7 @@
 
       <div class="drawerControls">
         <div class="row">
-          <input id="search" type="search" placeholder="Search (title, system, tags)…" autocomplete="off" />
+          <input id="search" type="search" placeholder="Search…" autocomplete="off" />
         </div>
         <div class="row">
           <select id="systemFilter" title="System filter">
@@ -435,10 +495,10 @@
             <option value="">All tags</option>
           </select>
           <select id="sortBy" title="Sort">
-            <option value="episode">Sort: Episode #</option>
-            <option value="name">Sort: Name</option>
-            <option value="system">Sort: System</option>
-            <option value="tag">Sort: Tag</option>
+            <option value="episode">Episode #</option>
+            <option value="name">Name</option>
+            <option value="system">System</option>
+            <option value="tag">Tag</option>
           </select>
         </div>
       </div>
@@ -827,7 +887,7 @@
     overlay.setAttribute("aria-hidden", "false");
     setPlayButtonState();
     setSeekUIFromAudio();
-    // IMPORTANT: no auto-focus on search (prevents keyboard popping up)
+    // No auto-focus on search (prevents keyboard popping up)
   }
   function closeList(){
     overlay.classList.remove("show");
@@ -939,8 +999,8 @@
       div.innerHTML = `
         <div class="itemTitle">${escapeHtml(displayListTitle(ep))}</div>
         <div class="itemMeta">
-          ${hasSaved ? `<span class="pill">Continue ${escapeHtml(fmtTime(saved))}</span>` : ``}
-          ${isActive ? `<span class="pill">Now</span>` : ``}
+          ${hasSaved ? `<span class="pillInList">Continue ${escapeHtml(fmtTime(saved))}</span>` : ``}
+          ${isActive ? `<span class="pillInList">Now</span>` : ``}
         </div>
       `;
       div.addEventListener("click", () => {
@@ -1042,14 +1102,13 @@
         if (typeof last.position === "number" && isFinite(last.position) && last.position > 0){
           setProgress(last.id, last.position);
         }
-        await loadEpisode(last.id, { autoPlay: false, seekToSaved: true }); // no autoplay on open
+        await loadEpisode(last.id, { autoPlay: false, seekToSaved: true });
         audio.pause();
         setPlayButtonState();
         nowPillEl.textContent = "Ready";
       }
     } catch (err){
       console.error(err);
-      // keep UI clean
       nowTitleEl.textContent = "Pick an episode from the list";
       nowPillEl.textContent = "Ready";
       prevLabelEl.textContent = "—";
