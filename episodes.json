@@ -158,5 +158,61 @@
   "system": "Neurology",
   "tags": ["Neurology", "Dementia", "The Clutch"],
   "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2025/05/dip-ep-599-clutch-dementia.mp3"
+  },
+  {
+  "id": "Pediat-001",
+  "episodeNumber": 17,
+  "title": "Diseases of Pediatric Part 1",
+  "system": "Pediatrics",
+  "tags": ["Pediatrics"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2018/04/divine-intervention-episode-17-diseases-of-the-pediatric-population-part-1.mp3"
+  },
+  {
+  "id": "Pediat-002",
+  "episodeNumber": 223,
+  "title": "NBME Peds Shelf Add-On",
+  "system": "Pediatrics",
+  "tags": ["Pediatrics"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2020/03/episode-223-newborn-1.mp3"
+  },
+  {
+  "id": "Pediat-003",
+  "episodeNumber": 317,
+  "title": "Breastfeeding, Newborn Jaundice",
+  "system": "Pediatrics",
+  "tags": ["Pediatrics"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2021/06/episode-317-bf-and-j.mp3"
+  },
+  {
+  "id": "Pediat-004",
+  "episodeNumber": 326,
+  "title": "Pediatric Cardiology and Hemodynamic Changes",
+  "system": "Pediatrics",
+  "tags": ["Pediatrics"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2021/07/episode-326-peds-cardio-hemodynamics.mp3"
+  },
+  {
+  "id": "Pediat-005",
+  "episodeNumber": 421,
+  "title": "Pulmonary Pathophysiology",
+  "system": "Pediatrics",
+  "tags": ["Pediatrics", "Pulmonary"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2022/10/episode-421-pulmonary-pathophysiology-11.mp3"
+  },
+  {
+  "id": "Pediat-006",
+  "episodeNumber": 507,
+  "title": "Sickle Cell Disease Part 1",
+  "system": "Pediatrics",
+  "tags": ["Pediatrics", "Hematology", "The Clutch"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2024/01/episode-507-clutch-sickle-cell-1.mp3"
+  },
+  {
+  "id": "Pediat-007",
+  "episodeNumber": 508,
+  "title": "Sickle Cell Disease Part 2",
+  "system": "Pediatrics",
+  "tags": ["Pediatrics", "Hematology", "The Clutch"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2024/02/episode-508-clutch-sickle-cell-2.mp3"
   }
 ]
