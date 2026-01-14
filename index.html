@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Audio Library Prototype</title>
+  <style>
+    :root{
+      --bg:#0b0f14; --card:#121a24; --muted:#aab6c6; --text:#eaf1ff;
+      --line:rgba(255,255,255,.10); --chip:rgba(255,255,255,.10);
+      --chipOn:rgba(100,180,255,.22);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color-scheme: dark;
+    }
+    body{margin:0;background:var(--bg);color:var(--text);}
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      padding:14px 14px 10px;
+      background:rgba(11,15,20,.92);
+      border-bottom:1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+    .title{font-size:18px;font-weight:700;margin:0 0 10px;}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    input[type="search"]{
+      flex:1; min-width:220px;
+      padding:12px 12px; border-radius:12px;
+      border:1px solid var(--line); background:rgba(255,255,255,.05);
+      color:var(--text); outline:none;
+    }
+    select{
+      padding:12px 12px; border-radius:12px;
+      border:1px solid var(--line); background:rgba(255,255,255,.05);
+      color:var(--text); outline:none;
+    }
+    .content{padding:14px; display:grid; gap:12px; max-width:980px; margin:0 auto;}
+    .status{color:var(--muted); font-size:13px; margin-top:6px;}
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.25);
+    }
+    .card h3{margin:0 0 6px; font-size:16px;}
+    .desc{margin:0 0 10px; color:var(--muted); font-size:13px; line-height:1.35}
+    .chips{display:flex; flex-wrap:wrap; gap:8px; margin:0 0 12px;}
+    .chip{
+      font-size:12px; color:var(--text);
+      padding:6px 10px; border-radius:999px;
+      border:1px solid var(--line);
+      background:var(--chip);
+      cursor:pointer; user-select:none;
+    }
+    .chip.on{background:var(--chipOn); border-color:rgba(120,200,255,.35);}
+    .btnrow{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    button{
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      cursor:pointer;
+      font-weight:600;
+    }
+    button.primary{
+      background:rgba(100,180,255,.20);
+      border-color:rgba(120,200,255,.35);
+    }
+    button:disabled{opacity:.55; cursor:not-allowed;}
+    .small{font-size:12px; color:var(--muted);}
+    .playerWrap{max-width:980px; margin:10px auto 18px; padding:0 14px;}
+    .player{
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px;
+      display:grid; gap:10px;
+    }
+    .now{display:flex; flex-wrap:wrap; gap:8px; align-items:baseline; justify-content:space-between;}
+    .nowTitle{font-weight:700}
+    .badge{
+      font-size:12px; padding:4px 10px; border-radius:999px;
+      border:1px solid var(--line); background:rgba(255,255,255,.06);
+      color:var(--muted);
+    }
+    audio{width:100%;}
+    .hint{color:var(--muted); font-size:12px; line-height:1.35;}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="title">Step Review Audio (Prototype)</div>
+    <div class="row">
+      <input id="q" type="search" placeholder="Search title, tags, description…" autocomplete="off" />
+      <select id="tagSelect" title="Filter by tag">
+        <option value="">All tags</option>
+      </select>
+      <select id="speed" title="Playback speed">
+        <option value="0.75">0.75×</option>
+        <option value="1" selected>1×</option>
+        <option value="1.25">1.25×</option>
+        <option value="1.5">1.5×</option>
+        <option value="2">2×</option>
+      </select>
+    </div>
+    <div id="status" class="status">Loading…</div>
+  </div>
+
+  <div class="playerWrap">
+    <div class="player">
+      <div class="now">
+        <div class="nowTitle" id="nowTitle">Nothing playing</div>
+        <div class="badge" id="nowBadge">No episode selected</div>
+      </div>
+      <audio id="audio" controls preload="metadata"></audio>
+      <div class="hint">
+        Progress is saved automatically on this device (local storage). You can resume later.
+        <span class="mono">Continue</span> appears if an episode has saved progress.
+      </div>
+    </div>
+  </div>
+
+  <div class="content" id="list"></div>
+
+<script>
+(() => {
+  const JSON_URL = "./episodes.json"; // same folder
+  const listEl = document.getElementById("list");
+  const statusEl = document.getElementById("status");
+  const qEl = document.getElementById("q");
+  const tagSelectEl = document.getElementById("tagSelect");
+  const audioEl = document.getElementById("audio");
+  const speedEl = document.getElementById("speed");
+  const nowTitleEl = document.getElementById("nowTitle");
+  const nowBadgeEl = document.getElementById("nowBadge");
+
+  let episodes = [];
+  let activeTag = "";
+  let activeId = null;
+  let saveTimer = null;
+
+  const LS_KEY = "audio_progress_v1"; // { [episodeId]: seconds }
+  const loadProgressMap = () => {
+    try { return JSON.parse(localStorage.getItem(LS_KEY) || "{}"); }
+    catch { return {}; }
+  };
+  const saveProgressMap = (map) => localStorage.setItem(LS_KEY, JSON.stringify(map));
+
+  const getSavedSeconds = (episodeId) => {
+    const map = loadProgressMap();
+    const v = map[episodeId];
+    return (typeof v === "number" && isFinite(v) && v > 0) ? v : 0;
+  };
+
+  const setSavedSeconds = (episodeId, seconds) => {
+    const map = loadProgressMap();
+    map[episodeId] = seconds;
+    saveProgressMap(map);
+  };
+
+  const formatTime = (sec) => {
+    sec = Math.max(0, Math.floor(sec));
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    if (h > 0) return `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    return `${m}:${String(s).padStart(2,"0")}`;
+  };
+
+  const buildTagList = () => {
+    const set = new Set();
+    episodes.forEach(e => (e.tags || []).forEach(t => set.add(String(t))));
+    const tags = Array.from(set).sort((a,b) => a.localeCompare(b));
+
+    // reset options
+    tagSelectEl.innerHTML = `<option value="">All tags</option>` + tags.map(t => {
+      const sel = (t === activeTag) ? "selected" : "";
+      return `<option value="${escapeHtml(t)}" ${sel}>${escapeHtml(t)}</option>`;
+    }).join("");
+  };
+
+  const escapeHtml = (s) => String(s)
+    .replaceAll("&","&amp;").replaceAll("<","&lt;")
+    .replaceAll(">","&gt;").replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+  const matchesFilter = (ep, term, tag) => {
+    const blob = [
+      ep.title, ep.description, (ep.tags||[]).join(" "),
+      ep.id
+    ].join(" ").toLowerCase();
+
+    if (term && !blob.includes(term)) return false;
+    if (tag && !(ep.tags||[]).map(x => String(x)).includes(tag)) return false;
+    return true;
+  };
+
+  const render = () => {
+    const term = qEl.value.trim().toLowerCase();
+    const tag = activeTag;
+
+    const filtered = episodes.filter(ep => matchesFilter(ep, term, tag));
+    statusEl.textContent = `Loaded ${episodes.length} episodes • Showing ${filtered.length}${tag ? ` • Tag: ${tag}` : ""}`;
+
+    listEl.innerHTML = "";
+    filtered.forEach(ep => {
+      const saved = getSavedSeconds(ep.id);
+      const hasSaved = saved > 3; // ignore tiny accidental saves
+
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const chips = (ep.tags || []).map(t => {
+        const on = (String(t) === activeTag);
+        return `<span class="chip ${on ? "on" : ""}" data-tag="${escapeHtml(t)}">${escapeHtml(t)}</span>`;
+      }).join("");
+
+      card.innerHTML = `
+        <h3>${escapeHtml(ep.title)}</h3>
+        <p class="desc">${escapeHtml(ep.description || "")}</p>
+        <div class="chips">${chips}</div>
+
+        <div class="btnrow">
+          <button class="primary" data-play="${escapeHtml(ep.id)}">Play</button>
+          <button data-resume="${escapeHtml(ep.id)}" ${hasSaved ? "" : "disabled"}>
+            Resume ${hasSaved ? `(${formatTime(saved)})` : ""}
+          </button>
+          <button data-restart="${escapeHtml(ep.id)}">Restart</button>
+          <span class="small">${hasSaved ? `<span class="badge">Continue</span>` : ""}</span>
+        </div>
+
+        <div class="small" style="margin-top:10px;">
+          <span class="mono">${escapeHtml(ep.url)}</span>
+        </div>
+      `;
+
+      listEl.appendChild(card);
+    });
+
+    // wire chip clicks
+    listEl.querySelectorAll(".chip").forEach(ch => {
+      ch.addEventListener("click", () => {
+        activeTag = ch.getAttribute("data-tag") || "";
+        tagSelectEl.value = activeTag;
+        render();
+      });
+    });
+
+    // wire buttons
+    listEl.querySelectorAll("button[data-play]").forEach(btn => {
+      btn.addEventListener("click", () => playEpisode(btn.getAttribute("data-play"), { resume: false }));
+    });
+    listEl.querySelectorAll("button[data-resume]").forEach(btn => {
+      btn.addEventListener("click", () => playEpisode(btn.getAttribute("data-resume"), { resume: true }));
+    });
+    listEl.querySelectorAll("button[data-restart]").forEach(btn => {
+      btn.addEventListener("click", () => restartEpisode(btn.getAttribute("data-restart")));
+    });
+  };
+
+  const playEpisode = async (episodeId, { resume }) => {
+    const ep = episodes.find(e => e.id === episodeId);
+    if (!ep) return;
+
+    // stop previous save timer
+    if (saveTimer) { clearInterval(saveTimer); saveTimer = null; }
+
+    activeId = ep.id;
+    nowTitleEl.textContent = ep.title;
+    nowBadgeEl.textContent = resume ? "Resuming…" : "Playing…";
+
+    // Load audio
+    audioEl.src = ep.url;
+    audioEl.playbackRate = parseFloat(speedEl.value || "1");
+
+    // When metadata loads, optionally seek to saved position
+    const saved = getSavedSeconds(ep.id);
+    audioEl.onloadedmetadata = () => {
+      if (resume && saved > 0 && isFinite(audioEl.duration) && saved < audioEl.duration - 1) {
+        audioEl.currentTime = saved;
+        nowBadgeEl.textContent = `Resumed at ${formatTime(saved)}`;
+      } else {
+        nowBadgeEl.textContent = "Playing";
+      }
+      audioEl.play().catch(() => {});
+    };
+
+    // autosave progress every 3s while playing
+    saveTimer = setInterval(() => {
+      if (!activeId) return;
+      if (!audioEl.src) return;
+      if (audioEl.paused) return;
+      const t = audioEl.currentTime;
+      if (isFinite(t) && t > 0) setSavedSeconds(activeId, t);
+    }, 3000);
+
+    // save on pause/end too
+    audioEl.onpause = () => {
+      if (!activeId) return;
+      const t = audioEl.currentTime;
+      if (isFinite(t) && t > 0) setSavedSeconds(activeId, t);
+      render(); // refresh Continue badges
+      nowBadgeEl.textContent = `Paused at ${formatTime(getSavedSeconds(activeId))}`;
+    };
+
+    audioEl.onended = () => {
+      // keep final position near end or optionally clear it; we’ll clear to mark “done”
+      if (activeId) setSavedSeconds(activeId, 0);
+      render();
+      nowBadgeEl.textContent = "Finished";
+    };
+  };
+
+  const restartEpisode = (episodeId) => {
+    setSavedSeconds(episodeId, 0);
+    if (activeId === episodeId) {
+      audioEl.currentTime = 0;
+      nowBadgeEl.textContent = "Restarted";
+      audioEl.play().catch(() => {});
+    }
+    render();
+  };
+
+  // UI events
+  qEl.addEventListener("input", () => render());
+  tagSelectEl.addEventListener("change", () => {
+    activeTag = tagSelectEl.value || "";
+    render();
+  });
+  speedEl.addEventListener("change", () => {
+    audioEl.playbackRate = parseFloat(speedEl.value || "1");
+  });
+
+  // Load JSON
+  (async () => {
+    try {
+      const res = await fetch(JSON_URL, { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      if (!Array.isArray(json)) throw new Error("episodes.json must be a JSON array");
+      episodes = json.map(e => ({
+        id: String(e.id || ""),
+        title: String(e.title || "Untitled"),
+        url: String(e.url || ""),
+        tags: Array.isArray(e.tags) ? e.tags.map(String) : [],
+        description: String(e.description || "")
+      })).filter(e => e.id && e.url);
+
+      buildTagList();
+      render();
+
+      if (episodes.length === 0) {
+        statusEl.textContent = "No episodes found. Check episodes.json fields (id, url).";
+      }
+    } catch (err) {
+      console.error(err);
+      statusEl.textContent = `Failed to load episodes.json: ${err.message}`;
+    }
+  })();
+})();
+</script>
+</body>
+</html>

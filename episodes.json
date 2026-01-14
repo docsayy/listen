@@ -1,0 +1,23 @@
+[
+  {
+    "id": "neuro-001",
+    "title": "Neurology — Stroke: Initial Approach",
+    "tags": ["Neurology", "Stroke", "Emergency"],
+    "url": "https://example.com/audio/neuro-stroke-initial.mp3",
+    "description": "FAST exam, CT-first logic, tPA/thrombectomy basics, key contraindications."
+  },
+  {
+    "id": "cardio-001",
+    "title": "Cardiology — ACS: STEMI vs NSTEMI",
+    "tags": ["Cardiology", "ACS", "EKG"],
+    "url": "https://example.com/audio/cardio-acs-stemi-nstemi.mp3",
+    "description": "EKG patterns, troponins, initial meds, cath timing, common traps."
+  },
+  {
+    "id": "pulm-001",
+    "title": "Pulmonary — Asthma vs COPD Exacerbation",
+    "tags": ["Pulmonary", "COPD", "Asthma"],
+    "url": "https://example.com/audio/pulm-asthma-copd-exac.mp3",
+    "description": "Steroids, bronchodilators, antibiotics logic, NIV pearls, discharge criteria."
+  }
+]
