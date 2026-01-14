@@ -1,23 +1,42 @@
 [
   {
-    "id": "neuro-001",
-    "title": "Neurology — Stroke: Initial Approach",
-    "tags": ["Neurology", "Stroke", "Emergency"],
-    "url": "https://example.com/audio/neuro-stroke-initial.mp3",
-    "description": "FAST exam, CT-first logic, tPA/thrombectomy basics, key contraindications."
+  "id": "neuro-001",
+  "episodeNumber": 19,
+  "title": "Neurology Shelf Review Part 1",
+  "system": "Neurology",
+  "tags": ["Neurology", "Part 1"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2018/04/divine-intervention-episode-19-neuro-shelf-review-part-1.mp3"
   },
   {
-    "id": "cardio-001",
-    "title": "Cardiology — ACS: STEMI vs NSTEMI",
-    "tags": ["Cardiology", "ACS", "EKG"],
-    "url": "https://example.com/audio/cardio-acs-stemi-nstemi.mp3",
-    "description": "EKG patterns, troponins, initial meds, cath timing, common traps."
+  "id": "neuro-002",
+  "episodeNumber": 45,
+  "title": "Neurology Shelf Review Part 2",
+  "system": "Neurology",
+  "tags": ["Neurology", "Part 2"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2018/08/divine-intervention-episode-45-neurology-clerkship-review-part-2.mp3"
   },
   {
-    "id": "pulm-001",
-    "title": "Pulmonary — Asthma vs COPD Exacerbation",
-    "tags": ["Pulmonary", "COPD", "Asthma"],
-    "url": "https://example.com/audio/pulm-asthma-copd-exac.mp3",
-    "description": "Steroids, bronchodilators, antibiotics logic, NIV pearls, discharge criteria."
+  "id": "neuro-003",
+  "episodeNumber": 46,
+  "title": "Neurology Shelf Review Part 3",
+  "system": "Neurology",
+  "tags": ["Neurology", "Part 3"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2018/08/divine-intervention-episode-46-neurology-clerkship-shelf-review-part-3.mp3"
+  },
+  {
+  "id": "neuro-004",
+  "episodeNumber": 47,
+  "title": "Neurology Shelf Review Part 4",
+  "system": "Neurology",
+  "tags": ["Neurology", "Part 4"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2018/08/divine-intervention-episode-47-neurology-clerkship-shelf-review-part-4.mp3"
+  },
+  {
+  "id": "neuro-005",
+  "episodeNumber": 48,
+  "title": "Neurology Shelf Review Part 5",
+  "system": "Neurology",
+  "tags": ["Neurology", "Part 5"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2018/09/divine-intervention-episode-48-neurology-shelf-review-part-5-1.mp3"
   }
 ]
