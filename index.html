@@ -3,25 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Step Review Audio</title>
+  <title>Audio Player</title>
   <style>
     :root{
-      /* Dark defaults (overridden by [data-theme="light"]) */
+      /* Dark defaults */
       --bg:#0b0f14;
       --panel:#101826;
       --card:rgba(255,255,255,.06);
       --text:#eaf1ff;
       --muted:#aab6c6;
       --line:rgba(255,255,255,.12);
-      --accent:rgba(100,180,255,.25);
+      --accent:rgba(100,180,255,.22);
       --accentLine:rgba(120,200,255,.40);
-      --shadow: 0 18px 40px rgba(0,0,0,.35);
       --btn:rgba(255,255,255,.08);
       --btnHover:rgba(255,255,255,.12);
-      --chip:rgba(255,255,255,.10);
-      --chipOn:rgba(100,180,255,.22);
-      --danger:rgba(255,90,90,.22);
-      --dangerLine:rgba(255,90,90,.35);
       --radius:18px;
       --radius2:14px;
       --font: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -36,13 +31,8 @@
       --line:rgba(10,20,40,.12);
       --accent:rgba(40,120,255,.16);
       --accentLine:rgba(40,120,255,.28);
-      --shadow: 0 18px 40px rgba(10,20,40,.12);
       --btn:rgba(10,20,40,.06);
       --btnHover:rgba(10,20,40,.10);
-      --chip:rgba(10,20,40,.06);
-      --chipOn:rgba(40,120,255,.16);
-      --danger:rgba(255,90,90,.16);
-      --dangerLine:rgba(255,90,90,.26);
       color-scheme: light;
     }
 
@@ -55,50 +45,23 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Top bar */
+    /* Top bar: only buttons on right + line below */
     .topbar{
       position: sticky;
       top: 0;
       z-index: 20;
-      padding: 14px 14px 12px;
-      background: color-mix(in oklab, var(--bg) 70%, transparent);
+      padding: 12px 14px;
+      background: color-mix(in oklab, var(--bg) 80%, transparent);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--line);
     }
     .toprow{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
       max-width: 980px;
       margin: 0 auto;
-    }
-    .brand{
-      display:flex;
-      align-items:baseline;
-      gap:10px;
-      min-width: 0;
-    }
-    .brand h1{
-      margin:0;
-      font-size:16px;
-      font-weight:800;
-      letter-spacing:.2px;
-      white-space:nowrap;
-    }
-    .status{
-      font-size:12px;
-      color:var(--muted);
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-      max-width: 60vw;
-    }
-    .actions{
       display:flex;
       align-items:center;
+      justify-content:flex-end;
       gap:10px;
-      flex: 0 0 auto;
     }
     .iconBtn{
       border:1px solid var(--line);
@@ -106,7 +69,7 @@
       color:var(--text);
       border-radius: 999px;
       padding: 10px 12px;
-      font-weight: 700;
+      font-weight: 800;
       cursor:pointer;
       display:flex;
       align-items:center;
@@ -117,54 +80,42 @@
     }
     .iconBtn:hover{ background: var(--btnHover); }
     .iconBtn:active{ transform: scale(.98); }
-    .icon{
-      width: 18px; height: 18px; display:inline-block;
-      opacity:.92;
-    }
+    .icon{ width:18px; height:18px; display:inline-block; opacity:.92; }
 
     /* Main */
     .wrap{
-      max-width:980px;
+      max-width: 980px;
       margin: 0 auto;
-      padding: 14px;
+      padding: 18px 14px 14px;
       display:grid;
-      gap: 14px;
+      place-items: center;
     }
 
-    /* Player card */
+    /* Player: centered, no shadow */
     .player{
+      width: min(720px, 100%);
       background: var(--panel);
-      border:1px solid var(--line);
+      border: 1px solid var(--line);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 14px;
+      padding: 16px 14px;
       display:grid;
       gap: 12px;
     }
-    .nowLine{
-      display:flex;
-      flex-wrap:wrap;
-      align-items:baseline;
-      justify-content:space-between;
-      gap: 8px;
+    .now{
+      display:grid;
+      gap: 6px;
+      text-align:center;
+      align-items:center;
+      justify-items:center;
     }
     .nowTitle{
       font-size:16px;
-      font-weight:800;
+      font-weight:900;
       letter-spacing:.1px;
-      min-width: 0;
+      max-width: 100%;
       overflow:hidden;
       text-overflow:ellipsis;
       white-space:nowrap;
-      max-width: 100%;
-    }
-    .subline{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      color:var(--muted);
-      font-size:12px;
-      flex-wrap:wrap;
     }
     .pill{
       border: 1px solid var(--line);
@@ -172,8 +123,17 @@
       padding: 4px 10px;
       border-radius: 999px;
       color: var(--muted);
-      font-weight: 700;
+      font-weight: 800;
       font-size: 12px;
+    }
+    .sub{
+      color: var(--muted);
+      font-size: 12px;
+      max-width: 100%;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      text-align:center;
     }
 
     .timeline{
@@ -185,6 +145,7 @@
       justify-content:space-between;
       color:var(--muted);
       font-size:12px;
+      font-variant-numeric: tabular-nums;
     }
     input[type="range"]{
       width:100%;
@@ -197,11 +158,10 @@
       justify-content:center;
       gap: 14px;
       padding-top: 2px;
-      flex-wrap:wrap;
     }
     .circleBtn{
-      width: 56px;
-      height: 56px;
+      width: 58px;
+      height: 58px;
       border-radius: 999px;
       border: 1px solid var(--accentLine);
       background: var(--accent);
@@ -213,6 +173,8 @@
       transition: transform .06s ease, filter .15s ease;
       user-select:none;
       -webkit-tap-highlight-color: transparent;
+      font-weight: 900;
+      font-size: 18px;
     }
     .circleBtn:hover{ filter: brightness(1.06); }
     .circleBtn:active{ transform: scale(.98); }
@@ -230,17 +192,20 @@
       user-select:none;
       -webkit-tap-highlight-color: transparent;
       transition: transform .06s ease, background .15s ease;
+      font-size: 16px;
+      font-weight: 900;
     }
     .sideBtn:hover{ background: var(--btnHover); }
     .sideBtn:active{ transform: scale(.98); }
 
+    /* Prev/Next info (no separator line) */
     .queue{
       display:grid;
       gap: 6px;
-      border-top: 1px solid var(--line);
-      padding-top: 10px;
       color: var(--muted);
       font-size: 12px;
+      text-align:center;
+      padding-top: 2px;
     }
     .queue strong{ color: color-mix(in oklab, var(--text) 75%, var(--muted)); }
     .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
@@ -270,11 +235,10 @@
       border-top-left-radius: 22px;
       border-top-right-radius: 22px;
       border: 1px solid var(--line);
-      box-shadow: var(--shadow);
       padding: 12px;
       display:grid;
       gap: 10px;
-      transform: translateY(8px);
+      transform: translateY(6px);
     }
     .drawerTop{
       display:flex;
@@ -286,14 +250,11 @@
     .drawerTop h2{
       margin:0;
       font-size: 14px;
-      font-weight: 900;
+      font-weight: 950;
       letter-spacing:.1px;
     }
-    .drawerControls{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
+
+    .drawerControls{ display:grid; gap: 10px; }
     .row{
       display:flex;
       gap: 10px;
@@ -307,7 +268,7 @@
       background: color-mix(in oklab, var(--panel) 85%, var(--btn) 15%);
       color: var(--text);
       outline:none;
-      font-weight: 650;
+      font-weight: 750;
     }
     input[type="search"]{ flex:1; min-width: 180px; }
     select{ flex:0 0 auto; }
@@ -323,8 +284,10 @@
       background: var(--card);
       border-radius: var(--radius2);
       padding: 12px;
-      display:grid;
-      gap: 8px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
       cursor:pointer;
       user-select:none;
       -webkit-tap-highlight-color: transparent;
@@ -332,20 +295,15 @@
     }
     .item:hover{ background: color-mix(in oklab, var(--card) 70%, var(--btn) 30%); }
     .item:active{ transform: scale(.995); }
-    .itemTop{
-      display:flex;
-      align-items:baseline;
-      justify-content:space-between;
-      gap: 10px;
-    }
     .itemTitle{
       margin:0;
-      font-weight: 900;
+      font-weight: 950;
       font-size: 14px;
       overflow:hidden;
       text-overflow:ellipsis;
       white-space:nowrap;
-      max-width: 72vw;
+      flex: 1 1 auto;
+      min-width: 0;
     }
     .itemMeta{
       color: var(--muted);
@@ -353,25 +311,11 @@
       display:flex;
       gap: 8px;
       align-items:center;
-      flex-wrap:wrap;
-    }
-    .chips{ display:flex; flex-wrap:wrap; gap: 8px; }
-    .chip{
-      font-size: 12px;
-      padding: 5px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      background: var(--chip);
-      color: color-mix(in oklab, var(--text) 80%, var(--muted));
-      font-weight: 800;
-    }
-    .chip.on{
-      background: var(--chipOn);
-      border-color: var(--accentLine);
-      color: var(--text);
+      flex: 0 0 auto;
+      white-space:nowrap;
     }
 
-    /* Mini player bar inside drawer */
+    /* Mini player in drawer */
     .mini{
       border-top:1px solid var(--line);
       padding-top: 10px;
@@ -386,33 +330,27 @@
     }
     .miniTitle{
       font-size: 13px;
-      font-weight: 900;
+      font-weight: 950;
       overflow:hidden;
       text-overflow:ellipsis;
       white-space:nowrap;
-      max-width: 72vw;
+      flex: 1 1 auto;
+      min-width: 0;
     }
-    .miniBtns{
-      display:flex;
-      gap: 8px;
-      align-items:center;
-    }
+    .miniBtns{ display:flex; gap: 8px; align-items:center; flex:0 0 auto; }
     .miniBtn{
       border:1px solid var(--line);
       background:var(--btn);
       color:var(--text);
       border-radius: 12px;
       padding: 10px 12px;
-      font-weight: 900;
+      font-weight: 950;
       cursor:pointer;
       user-select:none;
       -webkit-tap-highlight-color: transparent;
     }
     .miniBtn:hover{ background: var(--btnHover); }
-    .miniRange input[type="range"]{ width:100%; }
 
-    /* Helpers */
-    .muted{ color: var(--muted); }
     .hidden{ display:none !important; }
   </style>
 </head>
@@ -420,32 +358,23 @@
 
   <div class="topbar">
     <div class="toprow">
-      <div class="brand">
-        <h1>Step Review Audio</h1>
-        <div id="status" class="status">Loading episodes…</div>
-      </div>
-      <div class="actions">
-        <button id="openListBtn" class="iconBtn" type="button" title="Open list">
-          <span class="icon" aria-hidden="true">☰</span>
-          <span>List</span>
-        </button>
-        <button id="themeBtn" class="iconBtn" type="button" title="Toggle theme">
-          <span class="icon" aria-hidden="true">◐</span>
-          <span>Theme</span>
-        </button>
-      </div>
+      <button id="openListBtn" class="iconBtn" type="button" title="Open list">
+        <span class="icon" aria-hidden="true">☰</span>
+        <span>List</span>
+      </button>
+      <button id="themeBtn" class="iconBtn" type="button" title="Toggle theme">
+        <span class="icon" aria-hidden="true">◐</span>
+        <span>Theme</span>
+      </button>
     </div>
   </div>
 
   <div class="wrap">
     <section class="player" aria-label="Player">
-      <div class="nowLine">
+      <div class="now">
         <div id="nowTitle" class="nowTitle">Pick an episode from the list</div>
         <div id="nowPill" class="pill">Ready</div>
-      </div>
-      <div class="subline">
-        <span id="nowSystem" class="pill hidden"></span>
-        <span id="nowTags" class="muted"></span>
+        <div id="nowSub" class="sub"></div>
       </div>
 
       <div class="timeline">
@@ -457,26 +386,17 @@
       </div>
 
       <div class="controls">
-        <button id="prevBtn" class="sideBtn" type="button" title="Previous (hold to rewind)">
-          ⏮
-        </button>
-
-        <button id="playBtn" class="circleBtn" type="button" title="Play/Pause">
-          ▶
-        </button>
-
-        <button id="nextBtn" class="sideBtn" type="button" title="Next (hold to fast-forward)">
-          ⏭
-        </button>
+        <button id="prevBtn" class="sideBtn" type="button" title="Previous (hold to rewind)">⏮</button>
+        <button id="playBtn" class="circleBtn" type="button" title="Play/Pause">▶</button>
+        <button id="nextBtn" class="sideBtn" type="button" title="Next (hold to fast-forward)">⏭</button>
       </div>
 
       <div class="queue">
         <div><strong>Previous:</strong> <span id="prevLabel">—</span></div>
         <div><strong>Next:</strong> <span id="nextLabel">—</span></div>
-        <div class="muted">Tip: hold ⏮/⏭ to seek (10s → 20s → 30s → 60s)</div>
+        <div>Hold ⏮/⏭ to seek (10s → 20s → 30s → 60s)</div>
       </div>
 
-      <!-- Hidden audio element -->
       <audio id="audio" preload="metadata"></audio>
     </section>
   </div>
@@ -516,7 +436,6 @@
 
       <div id="list" class="list" tabindex="0"></div>
 
-      <!-- Mini player inside drawer so audio keeps going -->
       <div class="mini" aria-label="Mini player">
         <div class="miniTop">
           <div id="miniTitle" class="miniTitle">Nothing playing</div>
@@ -538,27 +457,21 @@
 
 <script>
 (() => {
-  // ===== Config =====
   const JSON_URL = "./episodes.json";
 
-  // ===== LocalStorage keys =====
   const LS = {
-    PROGRESS: "sr_audio_progress_v2",   // { [id]: seconds }
-    LAST:     "sr_audio_last_v2",       // { id, position }
-    THEME:    "sr_theme_v2",            // "dark" | "light"
-    HISTORY:  "sr_audio_history_v2"     // [id1, id2, ...] most recent last
+    PROGRESS: "sr_audio_progress_v2",
+    LAST:     "sr_audio_last_v2",
+    THEME:    "sr_theme_v2",
+    HISTORY:  "sr_audio_history_v2"
   };
-
-  // ===== Elements =====
-  const statusEl = document.getElementById("status");
 
   const openListBtn = document.getElementById("openListBtn");
   const themeBtn = document.getElementById("themeBtn");
 
   const nowTitleEl = document.getElementById("nowTitle");
   const nowPillEl  = document.getElementById("nowPill");
-  const nowSystemEl = document.getElementById("nowSystem");
-  const nowTagsEl = document.getElementById("nowTags");
+  const nowSubEl   = document.getElementById("nowSub");
 
   const prevLabelEl = document.getElementById("prevLabel");
   const nextLabelEl = document.getElementById("nextLabel");
@@ -589,27 +502,20 @@
   const miniCur = document.getElementById("miniCur");
   const miniDur = document.getElementById("miniDur");
 
-  // ===== State =====
-  /** @type {Array<{id:string, episodeNumber:number, title:string, system:string, tags:string[], url:string}>} */
   let episodes = [];
   let activeId = null;
   let nextId = null;
   let prevId = null;
-  let isLoaded = false;
 
-  // for stable next/prev history
   let history = loadJSON(LS.HISTORY, []);
   const HISTORY_LIMIT = 30;
 
-  // Holding seek timers
   let holdTimer = null;
   let holdInterval = null;
   let holdStartAt = 0;
 
-  // progress autosave timer
   let saveInterval = null;
 
-  // ===== Utilities =====
   function pad3(n){
     const x = Math.max(0, Math.floor(Number(n) || 0));
     return String(x).padStart(3, "0");
@@ -623,21 +529,15 @@
     return `${m}:${String(s).padStart(2,"0")}`;
   }
   function safeStr(v){ return String(v ?? "").trim(); }
-  function unique(arr){
-    return Array.from(new Set(arr.filter(Boolean)));
-  }
+  function unique(arr){ return Array.from(new Set(arr.filter(Boolean))); }
   function loadJSON(key, fallback){
     try{
       const raw = localStorage.getItem(key);
       if (!raw) return fallback;
       return JSON.parse(raw);
-    }catch{
-      return fallback;
-    }
+    }catch{ return fallback; }
   }
-  function saveJSON(key, value){
-    localStorage.setItem(key, JSON.stringify(value));
-  }
+  function saveJSON(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
 
   function getProgress(id){
     const map = loadJSON(LS.PROGRESS, {});
@@ -650,12 +550,8 @@
     saveJSON(LS.PROGRESS, map);
   }
 
-  function setLast(id, position){
-    saveJSON(LS.LAST, { id, position });
-  }
-  function getLast(){
-    return loadJSON(LS.LAST, null);
-  }
+  function setLast(id, position){ saveJSON(LS.LAST, { id, position }); }
+  function getLast(){ return loadJSON(LS.LAST, null); }
 
   function setTheme(theme){
     document.documentElement.setAttribute("data-theme", theme);
@@ -664,11 +560,7 @@
   }
   function initTheme(){
     const saved = localStorage.getItem(LS.THEME);
-    if (saved === "dark" || saved === "light"){
-      setTheme(saved);
-      return;
-    }
-    // default to system preference
+    if (saved === "dark" || saved === "light"){ setTheme(saved); return; }
     const prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
     setTheme(prefersLight ? "light" : "dark");
   }
@@ -677,14 +569,12 @@
     const epi = pad3(ep.episodeNumber);
     return `Epi ${epi} — ${ep.title} • ${ep.system}`;
   }
-  function displayShort(ep){
+  function displayListTitle(ep){
     const epi = pad3(ep.episodeNumber);
     return `Epi ${epi} — ${ep.title}`;
   }
 
-  function findById(id){
-    return episodes.find(e => e.id === id) || null;
-  }
+  function findById(id){ return episodes.find(e => e.id === id) || null; }
 
   function normalizeEpisode(raw){
     const id = safeStr(raw.id);
@@ -697,75 +587,20 @@
     return { id, url, system, title, episodeNumber, tags };
   }
 
-  // ===== Next/Prev logic =====
-  function computePrevNext(){
-    const cur = findById(activeId);
-    if (!cur){
-      prevId = null; nextId = null;
-      updatePrevNextLabels();
-      return;
-    }
-
-    // Previous: use history stack if possible (the immediate previous distinct item)
-    prevId = getPreviousFromHistory(activeId);
-
-    // Next:
-    // 1) episodeNumber+1 within same system (exact)
-    const sequential = episodes
-      .filter(e => e.system === cur.system)
-      .find(e => e.episodeNumber === cur.episodeNumber + 1);
-
-    if (sequential){
-      nextId = sequential.id;
-    } else {
-      // 2) smart-random: same system preferred, tags overlap, avoid recent history
-      nextId = pickSmartRandomNext(cur);
-    }
-
-    updatePrevNextLabels();
+  function pushHistory(id){
+    if (!id) return;
+    history.push(id);
+    if (history.length > HISTORY_LIMIT) history = history.slice(-HISTORY_LIMIT);
+    saveJSON(LS.HISTORY, history);
   }
 
   function getPreviousFromHistory(currentId){
-    // history is list of ids played in order; last element is most recent
-    // find currentId last index, then previous distinct item before it.
     const idx = history.lastIndexOf(currentId);
     if (idx <= 0) return null;
     for (let i = idx - 1; i >= 0; i--){
       if (history[i] !== currentId && findById(history[i])) return history[i];
     }
     return null;
-  }
-
-  function pickSmartRandomNext(cur){
-    const recentSet = new Set(history.slice(-10)); // avoid last 10
-    const candidates = episodes.filter(e => e.id !== cur.id);
-
-    // scoring
-    const scored = candidates.map(e => {
-      let score = 0;
-      if (e.system === cur.system) score += 30;
-
-      const overlap = countOverlap(cur.tags, e.tags);
-      if (overlap >= 2) score += 20;
-      else if (overlap === 1) score += 10;
-
-      if (recentSet.has(e.id)) score -= 50; // avoid repeats
-
-      // mild bias toward close episode numbers in same system
-      if (e.system === cur.system){
-        const dist = Math.abs(e.episodeNumber - cur.episodeNumber);
-        score += Math.max(0, 8 - dist); // small bonus if nearby
-      }
-
-      return { id: e.id, score };
-    });
-
-    // Prefer positive scores; fallback to anything non-recent; fallback to any.
-    const pool1 = scored.filter(x => x.score > 0);
-    const pool2 = scored.filter(x => !recentSet.has(x.id));
-    const pool = pool1.length ? pool1 : (pool2.length ? pool2 : scored);
-
-    return weightedRandom(pool) || null;
   }
 
   function countOverlap(a, b){
@@ -776,11 +611,8 @@
     }
     return n;
   }
-
   function weightedRandom(items){
-    // items: [{id, score}]
-    // Convert score to weight
-    const weights = items.map(x => Math.max(1, Math.floor(x.score + 10))); // keep >=1
+    const weights = items.map(x => Math.max(1, Math.floor(x.score + 10)));
     const total = weights.reduce((s,v)=>s+v,0);
     if (total <= 0) return null;
     let r = Math.random() * total;
@@ -790,32 +622,48 @@
     }
     return items[items.length - 1]?.id || null;
   }
+  function pickSmartRandomNext(cur){
+    const recentSet = new Set(history.slice(-10));
+    const candidates = episodes.filter(e => e.id !== cur.id);
+    const scored = candidates.map(e => {
+      let score = 0;
+      if (e.system === cur.system) score += 30;
+      const overlap = countOverlap(cur.tags, e.tags);
+      if (overlap >= 2) score += 20;
+      else if (overlap === 1) score += 10;
+      if (recentSet.has(e.id)) score -= 50;
+      if (e.system === cur.system){
+        const dist = Math.abs(e.episodeNumber - cur.episodeNumber);
+        score += Math.max(0, 8 - dist);
+      }
+      return { id: e.id, score };
+    });
 
-  function updatePrevNextLabels(){
-    const prevEp = prevId ? findById(prevId) : null;
-    const nextEp = nextId ? findById(nextId) : null;
-    prevLabelEl.textContent = prevEp ? displayShort(prevEp) : "—";
-    nextLabelEl.textContent = nextEp ? displayShort(nextEp) : "—";
+    const pool1 = scored.filter(x => x.score > 0);
+    const pool2 = scored.filter(x => !recentSet.has(x.id));
+    const pool = pool1.length ? pool1 : (pool2.length ? pool2 : scored);
+    return weightedRandom(pool) || null;
   }
 
-  // ===== Player behavior =====
-  function setNowPlayingUI(ep){
-    nowTitleEl.textContent = displayName(ep);
-    nowPillEl.textContent = audio.paused ? "Paused" : "Playing";
-    nowSystemEl.textContent = ep.system;
-    nowSystemEl.classList.remove("hidden");
-    nowTagsEl.textContent = (ep.tags && ep.tags.length) ? `Tags: ${ep.tags.join(", ")}` : "";
-    miniTitleEl.textContent = displayName(ep);
-  }
+  function computePrevNext(){
+    const cur = findById(activeId);
+    if (!cur){
+      prevId = null; nextId = null;
+      prevLabelEl.textContent = "—";
+      nextLabelEl.textContent = "—";
+      return;
+    }
 
-  function setReadyUI(){
-    nowTitleEl.textContent = "Pick an episode from the list";
-    nowPillEl.textContent = "Ready";
-    nowSystemEl.classList.add("hidden");
-    nowTagsEl.textContent = "";
-    miniTitleEl.textContent = "Nothing playing";
-    prevLabelEl.textContent = "—";
-    nextLabelEl.textContent = "—";
+    prevId = getPreviousFromHistory(activeId);
+
+    const sequential = episodes
+      .filter(e => e.system === cur.system)
+      .find(e => e.episodeNumber === cur.episodeNumber + 1);
+
+    nextId = sequential ? sequential.id : pickSmartRandomNext(cur);
+
+    prevLabelEl.textContent = prevId ? displayListTitle(findById(prevId)) : "—";
+    nextLabelEl.textContent = nextId ? displayListTitle(findById(nextId)) : "—";
   }
 
   function setPlayButtonState(){
@@ -845,8 +693,9 @@
 
     if (hasMeta){
       const v = Math.floor((cur / dur) * 1000);
-      seek.value = String(Math.max(0, Math.min(1000, v)));
-      miniSeek.value = seek.value;
+      const clamped = String(Math.max(0, Math.min(1000, v)));
+      seek.value = clamped;
+      miniSeek.value = clamped;
     } else {
       seek.value = "0";
       miniSeek.value = "0";
@@ -856,11 +705,8 @@
   function startAutosave(){
     stopAutosave();
     saveInterval = setInterval(() => {
-      if (!activeId) return;
-      if (!audio.src) return;
+      if (!activeId || !audio.src || audio.paused) return;
       if (!isFinite(audio.currentTime)) return;
-      if (audio.paused) return;
-
       const t = audio.currentTime;
       if (t > 0) setProgress(activeId, t);
       setLast(activeId, t);
@@ -873,35 +719,24 @@
     }
   }
 
-  function pushHistory(id){
-    if (!id) return;
-    history.push(id);
-    // keep last HISTORY_LIMIT
-    if (history.length > HISTORY_LIMIT) history = history.slice(-HISTORY_LIMIT);
-    saveJSON(LS.HISTORY, history);
-  }
-
   async function loadEpisode(id, { autoPlay = false, seekToSaved = true } = {}){
     const ep = findById(id);
     if (!ep) return;
 
     activeId = ep.id;
-
-    // Set src
     audio.src = ep.url;
     audio.load();
 
-    // UI
-    setNowPlayingUI(ep);
-    setPlayButtonState();
+    nowTitleEl.textContent = displayName(ep);
+    nowSubEl.textContent = ""; // keep clean/centered
     nowPillEl.textContent = "Ready";
+    miniTitleEl.textContent = displayName(ep);
+    setPlayButtonState();
     setSeekUIFromAudio();
 
-    // Update history + compute next/prev
     pushHistory(ep.id);
     computePrevNext();
 
-    // When metadata loads, optionally seek
     audio.onloadedmetadata = () => {
       const dur = audio.duration;
       if (seekToSaved){
@@ -913,67 +748,40 @@
       setSeekUIFromAudio();
       setLast(ep.id, audio.currentTime || 0);
       setPlayButtonState();
-
-      if (autoPlay){
-        audio.play().catch(()=>{});
-      }
+      if (autoPlay) audio.play().catch(()=>{});
     };
-
-    // Important: NO autoplay on app open; but if user picks from list, autoPlay=true.
-    // We'll control that from caller.
   }
 
   function togglePlay(){
-    if (!audio.src){
-      // If nothing selected, open list
-      openList();
-      return;
-    }
-    if (audio.paused){
-      audio.play().catch(()=>{});
-    } else {
-      audio.pause();
-    }
+    if (!audio.src){ openList(); return; }
+    if (audio.paused) audio.play().catch(()=>{});
+    else audio.pause();
   }
 
   function playNextTrack(){
-    if (!activeId){
-      openList();
-      return;
-    }
-    if (nextId){
-      loadEpisode(nextId, { autoPlay: true, seekToSaved: true });
-    }
+    if (!activeId){ openList(); return; }
+    if (nextId) loadEpisode(nextId, { autoPlay: true, seekToSaved: true });
   }
 
   function playPrevTrack(){
-    if (!activeId){
-      openList();
-      return;
-    }
-    // If there's a previous track in history, go there
+    if (!activeId){ openList(); return; }
     if (prevId){
       loadEpisode(prevId, { autoPlay: true, seekToSaved: true });
-    } else {
-      // Otherwise, try episodeNumber - 1 within same system
-      const cur = findById(activeId);
-      if (!cur) return;
-      const prevSeq = episodes
-        .filter(e => e.system === cur.system)
-        .find(e => e.episodeNumber === cur.episodeNumber - 1);
-      if (prevSeq) loadEpisode(prevSeq.id, { autoPlay: true, seekToSaved: true });
+      return;
     }
+    const cur = findById(activeId);
+    if (!cur) return;
+    const prevSeq = episodes
+      .filter(e => e.system === cur.system)
+      .find(e => e.episodeNumber === cur.episodeNumber - 1);
+    if (prevSeq) loadEpisode(prevSeq.id, { autoPlay: true, seekToSaved: true });
   }
 
-  // ===== Hold-to-seek logic =====
   function seekBy(seconds){
     if (!audio.src) return;
     if (!isFinite(audio.duration) || audio.duration <= 0) return;
-
     const next = Math.max(0, Math.min(audio.duration, (audio.currentTime || 0) + seconds));
     audio.currentTime = next;
-
-    // Save immediately
     if (activeId){
       setProgress(activeId, next);
       setLast(activeId, next);
@@ -982,10 +790,6 @@
   }
 
   function holdStepSeconds(elapsedMs){
-    // 0.35–1.0s -> 10s
-    // 1.0–2.0s -> 20s
-    // 2.0–3.5s -> 30s
-    // >3.5s -> 60s
     if (elapsedMs < 1000) return 10;
     if (elapsedMs < 2000) return 20;
     if (elapsedMs < 3500) return 30;
@@ -993,14 +797,9 @@
   }
 
   function startHold(direction){
-    // direction: -1 (rewind) or +1 (ff)
     if (!audio.src) return;
-
     clearHold();
-
     holdStartAt = performance.now();
-
-    // After 350ms, start repeating seek
     holdTimer = setTimeout(() => {
       holdInterval = setInterval(() => {
         const elapsed = performance.now() - holdStartAt;
@@ -1015,33 +814,28 @@
     if (holdInterval){ clearInterval(holdInterval); holdInterval = null; }
   }
 
-  // ===== Drawer =====
   function openList(){
     overlay.classList.add("show");
     overlay.setAttribute("aria-hidden", "false");
-    // Sync mini player UI
     setPlayButtonState();
     setSeekUIFromAudio();
-    // Focus search quickly
     setTimeout(() => searchEl.focus(), 50);
   }
-
   function closeList(){
     overlay.classList.remove("show");
     overlay.setAttribute("aria-hidden", "true");
   }
 
-  // ===== List rendering & filtering =====
   function buildFilters(){
     const systems = unique(episodes.map(e => e.system)).sort((a,b)=>a.localeCompare(b));
-    systemFilterEl.innerHTML = `<option value="">All systems</option>` + systems.map(s => (
-      `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`
-    )).join("");
+    systemFilterEl.innerHTML =
+      `<option value="">All systems</option>` +
+      systems.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join("");
 
     const tags = unique(episodes.flatMap(e => e.tags || [])).sort((a,b)=>a.localeCompare(b));
-    tagFilterEl.innerHTML = `<option value="">All tags</option>` + tags.map(t => (
-      `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`
-    )).join("");
+    tagFilterEl.innerHTML =
+      `<option value="">All tags</option>` +
+      tags.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("");
   }
 
   function escapeHtml(s){
@@ -1095,7 +889,6 @@
       return arr;
     }
     if (sortBy === "tag"){
-      // Sort by first tag alphabetically, then system, then episode
       const firstTag = (e) => (e.tags && e.tags.length) ? [...e.tags].sort((x,y)=>x.localeCompare(y))[0] : "";
       arr.sort((a,b) => {
         const t = firstTag(a).localeCompare(firstTag(b));
@@ -1123,7 +916,7 @@
       const empty = document.createElement("div");
       empty.className = "item";
       empty.style.cursor = "default";
-      empty.innerHTML = `<div class="itemTitle">No matches</div><div class="itemMeta">Try clearing filters.</div>`;
+      empty.innerHTML = `<div class="itemTitle">No matches</div><div class="itemMeta">Clear filters</div>`;
       listEl.appendChild(empty);
       return;
     }
@@ -1137,24 +930,15 @@
       div.className = "item";
       div.setAttribute("data-id", ep.id);
 
-      const chips = (ep.tags || []).slice(0, 6).map(t => {
-        const on = (tag && t === tag);
-        return `<span class="chip ${on ? "on" : ""}">${escapeHtml(t)}</span>`;
-      }).join("");
-
+      // Decluttered: only title (no system/tags shown in list item)
       div.innerHTML = `
-        <div class="itemTop">
-          <div class="itemTitle">${escapeHtml(displayShort(ep))}</div>
-          <div class="itemMeta">
-            <span class="pill">${escapeHtml(ep.system)}</span>
-            ${hasSaved ? `<span class="pill">Continue ${escapeHtml(fmtTime(saved))}</span>` : ``}
-            ${isActive ? `<span class="pill">Now</span>` : ``}
-          </div>
+        <div class="itemTitle">${escapeHtml(displayListTitle(ep))}</div>
+        <div class="itemMeta">
+          ${hasSaved ? `<span class="pill">Continue ${escapeHtml(fmtTime(saved))}</span>` : ``}
+          ${isActive ? `<span class="pill">Now</span>` : ``}
         </div>
-        <div class="chips">${chips}</div>
       `;
 
-      // Clicking an item should start playing immediately
       div.addEventListener("click", () => {
         loadEpisode(ep.id, { autoPlay: true, seekToSaved: true });
       });
@@ -1163,43 +947,30 @@
     }
   }
 
-  // ===== Event wiring =====
   function wireEvents(){
-    // Drawer open/close
     openListBtn.addEventListener("click", openList);
     closeListBtn.addEventListener("click", closeList);
     miniCloseBtn.addEventListener("click", closeList);
     backdrop.addEventListener("click", closeList);
 
-    // Theme
     themeBtn.addEventListener("click", () => {
       const cur = document.documentElement.getAttribute("data-theme") || "dark";
       setTheme(cur === "dark" ? "light" : "dark");
     });
 
-    // List controls
     searchEl.addEventListener("input", renderList);
     systemFilterEl.addEventListener("change", renderList);
     tagFilterEl.addEventListener("change", renderList);
     sortByEl.addEventListener("change", renderList);
 
-    // Player controls
     playBtn.addEventListener("click", togglePlay);
     miniPlayBtn.addEventListener("click", togglePlay);
 
-    // Tap prev/next: track change
-    prevBtn.addEventListener("click", () => {
-      // If user is holding, click may also fire; but we cancel hold on pointerup
-      playPrevTrack();
-    });
-    nextBtn.addEventListener("click", () => {
-      playNextTrack();
-    });
+    prevBtn.addEventListener("click", playPrevTrack);
+    nextBtn.addEventListener("click", playNextTrack);
 
-    // Hold-to-seek (pointer events)
     const setupHold = (btn, direction) => {
       btn.addEventListener("pointerdown", (e) => {
-        // prevent focus scroll on mobile
         try { btn.setPointerCapture(e.pointerId); } catch {}
         startHold(direction);
       });
@@ -1211,7 +982,6 @@
     setupHold(prevBtn, -1);
     setupHold(nextBtn, +1);
 
-    // Seek bar dragging
     const seekTo = (val) => {
       if (!audio.src) return;
       const dur = audio.duration;
@@ -1225,15 +995,10 @@
       }
       setSeekUIFromAudio();
     };
-
     seek.addEventListener("input", () => seekTo(seek.value));
     miniSeek.addEventListener("input", () => seekTo(miniSeek.value));
 
-    // Audio events
-    audio.addEventListener("play", () => {
-      setPlayButtonState();
-      startAutosave();
-    });
+    audio.addEventListener("play", () => { setPlayButtonState(); startAutosave(); });
     audio.addEventListener("pause", () => {
       setPlayButtonState();
       stopAutosave();
@@ -1243,24 +1008,18 @@
       }
       renderList();
     });
-    audio.addEventListener("timeupdate", () => {
-      setSeekUIFromAudio();
-    });
+    audio.addEventListener("timeupdate", () => setSeekUIFromAudio());
     audio.addEventListener("ended", () => {
       setPlayButtonState();
       stopAutosave();
-      // when ended, clear progress and move to next track automatically? (not requested)
-      // We'll keep it simple: clear progress, stay ended.
       if (activeId) setProgress(activeId, 0);
       renderList();
       nowPillEl.textContent = "Finished";
     });
   }
 
-  // ===== Load episodes.json =====
   async function init(){
     initTheme();
-
     wireEvents();
 
     try{
@@ -1269,38 +1028,29 @@
       const json = await res.json();
       if (!Array.isArray(json)) throw new Error("episodes.json must be a JSON array");
 
-      const parsed = json.map(normalizeEpisode).filter(Boolean);
-      episodes = parsed;
-
-      if (!episodes.length){
-        throw new Error("No valid episodes found. Required fields: id, episodeNumber, title, system, tags[], url");
-      }
-
-      isLoaded = true;
-      statusEl.textContent = `Loaded ${episodes.length} episodes`;
+      episodes = json.map(normalizeEpisode).filter(Boolean);
+      if (!episodes.length) throw new Error("No valid episodes found.");
 
       buildFilters();
       renderList();
 
-      // Restore last episode + position, but DO NOT autoplay
       const last = getLast();
       if (last && last.id && findById(last.id)){
-        // Ensure progress map has last position
         if (typeof last.position === "number" && isFinite(last.position) && last.position > 0){
           setProgress(last.id, last.position);
         }
-        await loadEpisode(last.id, { autoPlay: false, seekToSaved: true }); // no autoplay on opening
-        // Explicitly ensure paused
+        await loadEpisode(last.id, { autoPlay: false, seekToSaved: true }); // no autoplay on open
         audio.pause();
         setPlayButtonState();
         nowPillEl.textContent = "Ready";
-      } else {
-        setReadyUI();
       }
     } catch (err){
       console.error(err);
-      statusEl.textContent = `Failed to load episodes.json: ${err.message}`;
-      setReadyUI();
+      // Keep UI clean; no "loaded X episodes" text requested.
+      nowTitleEl.textContent = "Pick an episode from the list";
+      nowPillEl.textContent = "Ready";
+      prevLabelEl.textContent = "—";
+      nextLabelEl.textContent = "—";
     }
   }
 
