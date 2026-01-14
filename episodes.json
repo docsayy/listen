@@ -104,11 +104,59 @@
   "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2022/02/episode-374-sc-lesions.mp3"
   },
   {
-  "id": "neuro-012",
-  "episodeNumber": 374,
-  "title": "Spind cord lesions",
+  "id": "neuro-014",
+  "episodeNumber": 435,
+  "title": "Diseases of The Neuromuscular Junction",
   "system": "Neurology",
-  "tags": ["Neurology", "Spinal cord", "Spinal cord lesions"],
-  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2022/02/episode-374-sc-lesions.mp3"
+  "tags": ["Neurology", "Neuromuscular Junction"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2023/01/episode-435-nmj-diseases.mp3"
+  },
+  {
+  "id": "neuro-015",
+  "episodeNumber": 457,
+  "title": "Horner’s Syndrome",
+  "system": "Neurology",
+  "tags": ["Neurology", "Horner’s Syndrome"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2023/05/episode-457-horners-syndrome.mp3"
+  },
+  {
+  "id": "neuro-016",
+  "episodeNumber": 506,
+  "title": "Weird But HY Spinal Cord Disorders",
+  "system": "Neurology",
+  "tags": ["Neurology", "Spinal Cord Disorders"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2024/01/episode-506-weird-but-hy-spinal-cord-disorders-.mp3"
+  },
+  {
+  "id": "neuro-017",
+  "episodeNumber": 516,
+  "title": "Floridly HY Brain Tumor",
+  "system": "Neurology",
+  "tags": ["Neurology", "Brain Tumor"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2024/02/episode-516-the-floridly-hy-brain-tumor-podcast.mp3"
+  },
+  {
+  "id": "neuro-018",
+  "episodeNumber": 543,
+  "title": "Facial Muscle Weakness",
+  "system": "Neurology",
+  "tags": ["Neurology", "Facial Muscle Weakness"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2024/07/episode-543-facial-muscle-weakness.mp3"
+  },
+  {
+  "id": "neuro-019",
+  "episodeNumber": 546,
+  "title": "Super HY USMLE Neurology Integrations",
+  "system": "Neurology",
+  "tags": ["Neurology", "Super HY USMLE Neurology Integrations"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2024/08/episode-546-super-hy-neuro-integrations.mp3"
+  },
+  {
+  "id": "neuro-020",
+  "episodeNumber": 599,
+  "title": "Dementia",
+  "system": "Neurology",
+  "tags": ["Neurology", "Dementia", "The Clutch"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2025/05/dip-ep-599-clutch-dementia.mp3"
   }
 ]
