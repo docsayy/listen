@@ -214,5 +214,101 @@
   "system": "Pediatrics",
   "tags": ["Pediatrics", "Hematology", "The Clutch"],
   "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2024/02/episode-508-clutch-sickle-cell-2.mp3"
+  },
+  {
+  "id": "Obgyn-002",
+  "episodeNumber": 118,
+  "title": "Some Confusing Breast Pathologies",
+  "system": "OB/GYN",
+  "tags": ["OB/GYN", "Breast"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2019/06/episode-118-breast.mp3"
+  },
+  {
+  "id": "Obgyn-003",
+  "episodeNumber": 239,
+  "title": "OBGYN Risk Factors",
+  "system": "OB/GYN",
+  "tags": ["OB/GYN", "OBGYN Risk Factors", "Risk factors"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2020/06/episode-239-ob-rfs.mp3"
+  },
+  {
+  "id": "Obgyn-004",
+  "episodeNumber": 278,
+  "title": "Amenorrhea",
+  "system": "OB/GYN",
+  "tags": ["OB/GYN", "Amenorrhea"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2020/12/episode-278-amenorrhea.mp3"
+  },
+  {
+  "id": "Obgyn-005",
+  "episodeNumber": 309,
+  "title": "Breast Cancer",
+  "system": "OB/GYN",
+  "tags": ["OB/GYN", "Breast Cancer", "Cancer", "The Clutch"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2021/04/episode-309-breast-cancer-.mp3"
+  },
+  {
+  "id": "Obgyn-006",
+  "episodeNumber": 338,
+  "title": "Fetal Heart rate tracing",
+  "system": "OB/GYN",
+  "tags": ["OB/GYN", "Fetal Heart rate tracing"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2021/09/episode-338-fetal-heart-rate-tracings-.mp3"
+  },
+  {
+  "id": "Obgyn-007",
+  "episodeNumber": 350,
+  "title": "Teratogens",
+  "system": "OB/GYN",
+  "tags": ["OB/GYN", "Teratogens", "The Clutch"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2021/11/episode-350-teratogens.mp3"
+  },
+  {
+  "id": "Obgyn-008",
+  "episodeNumber": 357,
+  "title": "Disorders of Sexual Differentiation",
+  "system": "OB/GYN",
+  "tags": ["OB/GYN", "Disorders of Sexual Differentiation", "The Clutch"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2021/12/dsd-review-podcast.mp3"
+  },
+  {
+  "id": "Obgyn-009",
+  "episodeNumber": 373,
+  "title": "Progestin and estrogen challenge tests",
+  "system": "OB/GYN",
+  "tags": ["OB/GYN", "Progestin and estrogen challenge tests"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2022/02/episode-373-progestin-and-estrogen-challenge-tests.mp3"
+  },
+  {
+  "id": "Obgyn-010",
+  "episodeNumber": 459,
+  "title": "STI",
+  "system": "OB/GYN",
+  "tags": ["OB/GYN", "STI", "The Clutch"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2023/05/episode-459-clutch-sti-.mp3"
+  },
+  {
+  "id": "Obgyn-011",
+  "episodeNumber": 467,
+  "title": "Cervical cancer",
+  "system": "OB/GYN",
+  "tags": ["OB/GYN", "Cervical cancer", "Cancer", "The Clutch"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2023/06/episode-467-cervical-cancer-.mp3"
+  },
+  {
+  "id": "Obgyn-012",
+  "episodeNumber": 493,
+  "title": "Infertility",
+  "system": "OB/GYN",
+  "tags": ["OB/GYN", "Infertility", "The Clutch"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2023/12/episode-493-superclutch-infertility-.mp3"
+  },
+  {
+  "id": "Obgyn-013",
+  "episodeNumber": 531,
+  "title": "Contraception",
+  "system": "OB/GYN",
+  "tags": ["OB/GYN", "Contraception", "HY"],
+  "url": "https://divineinterventionpodcasts.com/wp-content/uploads/2024/04/episode-531-the-hy-contraception-podcast.mp3"
   }
 ]
