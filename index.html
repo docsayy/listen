@@ -1,0 +1,1123 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Audio Player</title>
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --panel:#101826;
+      --card:rgba(255,255,255,.06);
+      --text:#eaf1ff;
+      --muted:#aab6c6;
+      --line:rgba(255,255,255,.12);
+      --accent:rgba(100,180,255,.22);
+      --accentLine:rgba(120,200,255,.40);
+      --btn:rgba(255,255,255,.08);
+      --btnHover:rgba(255,255,255,.12);
+      --radius:18px;
+      --radius2:14px;
+      --font: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color-scheme: dark;
+    }
+    html[data-theme="light"]{
+      --bg:#f6f8fb;
+      --panel:#ffffff;
+      --card:rgba(10,20,40,.05);
+      --text:#0e1726;
+      --muted:#516074;
+      --line:rgba(10,20,40,.12);
+      --accent:rgba(40,120,255,.16);
+      --accentLine:rgba(40,120,255,.28);
+      --btn:rgba(10,20,40,.06);
+      --btnHover:rgba(10,20,40,.10);
+      color-scheme: light;
+    }
+
+    *{ box-sizing: border-box; }
+
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:var(--font);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden; /* prevent sideways cut-off */
+    }
+
+    .topbar{
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding: 12px 14px;
+      background: color-mix(in oklab, var(--bg) 80%, transparent);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+    .toprow{
+      max-width: 980px;
+      margin: 0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:10px;
+    }
+    .iconBtn{
+      border:1px solid var(--line);
+      background:var(--btn);
+      color:var(--text);
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-weight: 700;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      transition: transform .06s ease, background .15s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      max-width: 100%;
+    }
+    .iconBtn:hover{ background: var(--btnHover); }
+    .iconBtn:active{ transform: scale(.98); }
+    .icon{ width:18px; height:18px; display:inline-block; opacity:.92; }
+
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 18px 14px 14px;
+      display:grid;
+      place-items: center;
+    }
+
+    .player{
+      width: min(720px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px 14px;
+      display:grid;
+      gap: 12px;
+    }
+    .now{
+      display:grid;
+      gap: 6px;
+      text-align:center;
+      align-items:center;
+      justify-items:center;
+    }
+    .nowTitle{
+      font-size:16px;
+      font-weight:800;
+      letter-spacing:.1px;
+      max-width: 100%;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .pill{
+      border: 1px solid var(--line);
+      background: var(--card);
+      padding: 4px 10px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .sub{
+      color: var(--muted);
+      font-size: 12px;
+      max-width: 100%;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      text-align:center;
+    }
+
+    .timeline{ display:grid; gap: 8px; }
+    .timeRow{
+      display:flex;
+      justify-content:space-between;
+      color:var(--muted);
+      font-size:12px;
+      font-variant-numeric: tabular-nums;
+    }
+    input[type="range"]{
+      width:100%;
+      accent-color: color-mix(in oklab, var(--accentLine) 70%, #2aa3ff);
+    }
+
+    .controls{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 12px;
+      padding-top: 2px;
+    }
+
+    /* Smaller play button, clearer border; you can also remove border entirely by setting border:none */
+    .circleBtn{
+      width: 52px;
+      height: 52px;
+      border-radius: 999px;
+      border: 2px solid color-mix(in oklab, var(--accentLine) 85%, white 15%);
+      background: var(--accent);
+      color: var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition: transform .06s ease, filter .15s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      font-weight: 800;
+      font-size: 18px;
+    }
+    .circleBtn:hover{ filter: brightness(1.06); }
+    .circleBtn:active{ transform: scale(.98); }
+
+    .sideBtn{
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--btn);
+      color: var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .06s ease, background .15s ease;
+      font-size: 16px;
+      font-weight: 800;
+    }
+    .sideBtn:hover{ background: var(--btnHover); }
+    .sideBtn:active{ transform: scale(.98); }
+
+    .queue{
+      display:grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align:center;
+      padding-top: 2px;
+    }
+    .queue strong{ color: color-mix(in oklab, var(--text) 75%, var(--muted)); font-weight: 700; }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+    /* Drawer overlay */
+    .overlay{
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display:none;
+    }
+    .overlay.show{ display:block; }
+    .overlayBackdrop{
+      position:absolute;
+      inset:0;
+      background: rgba(0,0,0,.45);
+    }
+    html[data-theme="light"] .overlayBackdrop{
+      background: rgba(10,20,40,.30);
+    }
+
+    /* Fit drawer to viewport width so controls are always visible */
+    .drawer{
+      position:absolute;
+      left: 0; right: 0;
+      bottom: 0;
+      width: 100vw;              /* force fit */
+      max-width: 100vw;
+      height: 86vh;
+      background: var(--panel);
+      border-top-left-radius: 22px;
+      border-top-right-radius: 22px;
+      border: 1px solid var(--line);
+      border-bottom: none;
+      padding: 10px;             /* a bit tighter */
+      display:flex;
+      flex-direction: column;
+      gap: 8px;
+      transform: translateY(6px);
+      overflow: hidden;
+    }
+
+    .drawerTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 10px;
+      padding: 2px 2px 0;
+      flex: 0 0 auto;
+      min-width: 0;
+    }
+    .drawerTop h2{
+      margin:0;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing:.1px;
+    }
+
+    .drawerControls{
+      display:grid;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+
+    .row{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      flex-wrap: nowrap;       /* keep the 3 dropdowns on one row */
+      min-width: 0;
+    }
+
+    /* Smaller search + fonts */
+    input[type="search"], select{
+      padding: 9px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: color-mix(in oklab, var(--panel) 85%, var(--btn) 15%);
+      color: var(--text);
+      outline:none;
+      font-weight: 600;
+      font-size: 12px;
+      min-width: 0;
+    }
+    input[type="search"]{
+      width: 100%;
+    }
+
+    /* Equal-width dropdowns that fit on one row */
+    select{
+      flex: 1 1 0;
+      width: 0;                /* makes flex sizing behave consistently */
+      max-width: none;
+      appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+        linear-gradient(135deg, var(--muted) 50%, transparent 50%),
+        linear-gradient(to right, transparent, transparent);
+      background-position:
+        calc(100% - 16px) calc(50% - 3px),
+        calc(100% - 11px) calc(50% - 3px),
+        0 0;
+      background-size:
+        5px 5px,
+        5px 5px,
+        100% 100%;
+      background-repeat: no-repeat;
+      padding-right: 26px;
+    }
+
+    /* Scrollable list */
+    .list{
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      display:grid;
+      gap: 8px;
+      padding-right: 2px;
+    }
+
+    .item{
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: var(--radius2);
+      padding: 9px 10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      cursor:pointer;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .06s ease, background .15s ease;
+    }
+    .item:hover{ background: color-mix(in oklab, var(--card) 70%, var(--btn) 30%); }
+    .item:active{ transform: scale(.995); }
+
+    /* NO BOLD IN LIST */
+    .itemTitle{
+      margin:0;
+      font-weight: 500;
+      font-size: 12px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .itemMeta{
+      color: var(--muted);
+      font-size: 11px;
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      flex: 0 0 auto;
+      white-space:nowrap;
+      font-weight: 500;
+    }
+    .pillInList{
+      border: 1px solid var(--line);
+      background: var(--card);
+      padding: 3px 8px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 11px;
+    }
+
+    .mini{
+      border-top:1px solid var(--line);
+      padding-top: 8px;
+      display:grid;
+      gap: 6px;
+      flex: 0 0 auto;
+    }
+    .miniTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      min-width:0;
+    }
+    .miniTitle{
+      font-size: 12px;
+      font-weight: 650;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .miniBtns{ display:flex; gap: 8px; align-items:center; flex:0 0 auto; }
+    .miniBtn{
+      border:1px solid var(--line);
+      background:var(--btn);
+      color:var(--text);
+      border-radius: 12px;
+      padding: 9px 10px;
+      font-weight: 650;
+      cursor:pointer;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      font-size: 12px;
+    }
+    .miniBtn:hover{ background: var(--btnHover); }
+
+    /* Make the drawer and controls extra safe on tiny screens */
+    @media (max-width: 360px){
+      .iconBtn span:last-child{ display:none; } /* hide "List/Theme/Player" text */
+      .circleBtn{ width: 48px; height: 48px; font-size: 17px; }
+      .sideBtn{ width: 42px; height: 42px; }
+      .drawer{ padding: 8px; }
+      select, input[type="search"]{ font-size: 11px; padding: 8px 9px; border-radius: 11px; }
+      .itemTitle{ font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="toprow">
+      <button id="openListBtn" class="iconBtn" type="button" title="Open list">
+        <span class="icon" aria-hidden="true">☰</span>
+        <span>List</span>
+      </button>
+      <button id="themeBtn" class="iconBtn" type="button" title="Toggle theme">
+        <span class="icon" aria-hidden="true">◐</span>
+        <span>Theme</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section class="player" aria-label="Player">
+      <div class="now">
+        <div id="nowTitle" class="nowTitle">Pick an episode from the list</div>
+        <div id="nowPill" class="pill">Ready</div>
+        <div id="nowSub" class="sub"></div>
+      </div>
+
+      <div class="timeline">
+        <div class="timeRow">
+          <span id="tCur" class="mono">0:00</span>
+          <span id="tDur" class="mono">0:00</span>
+        </div>
+        <input id="seek" type="range" min="0" max="1000" value="0" step="1" disabled />
+      </div>
+
+      <div class="controls">
+        <button id="prevBtn" class="sideBtn" type="button" title="Previous (hold to rewind)">⏮</button>
+        <button id="playBtn" class="circleBtn" type="button" title="Play/Pause">▶</button>
+        <button id="nextBtn" class="sideBtn" type="button" title="Next (hold to fast-forward)">⏭</button>
+      </div>
+
+      <div class="queue">
+        <div><strong>Previous:</strong> <span id="prevLabel">—</span></div>
+        <div><strong>Next:</strong> <span id="nextLabel">—</span></div>
+      </div>
+
+      <audio id="audio" preload="metadata"></audio>
+    </section>
+  </div>
+
+  <!-- Drawer Overlay -->
+  <div id="overlay" class="overlay" aria-hidden="true">
+    <div id="backdrop" class="overlayBackdrop"></div>
+
+    <div class="drawer" role="dialog" aria-label="Episode list">
+      <div class="drawerTop">
+        <h2>Episodes</h2>
+        <button id="closeListBtn" class="iconBtn" type="button" title="Close">
+          <span class="icon" aria-hidden="true">✕</span>
+          <span>Player</span>
+        </button>
+      </div>
+
+      <div class="drawerControls">
+        <div class="row">
+          <input id="search" type="search" placeholder="Search…" autocomplete="off" />
+        </div>
+        <div class="row">
+          <select id="systemFilter" title="System filter">
+            <option value="">All systems</option>
+          </select>
+          <select id="tagFilter" title="Tag filter">
+            <option value="">All tags</option>
+          </select>
+          <select id="sortBy" title="Sort">
+            <option value="episode">Episode #</option>
+            <option value="name">Name</option>
+            <option value="system">System</option>
+            <option value="tag">Tag</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="list" class="list" tabindex="0"></div>
+
+      <div class="mini" aria-label="Mini player">
+        <div class="miniTop">
+          <div id="miniTitle" class="miniTitle">Nothing playing</div>
+          <div class="miniBtns">
+            <button id="miniPlay" class="miniBtn" type="button" title="Play/Pause">▶</button>
+            <button id="miniClose" class="miniBtn" type="button" title="Close list">Close</button>
+          </div>
+        </div>
+        <div class="miniRange">
+          <input id="miniSeek" type="range" min="0" max="1000" value="0" step="1" disabled />
+        </div>
+        <div class="timeRow">
+          <span id="miniCur" class="mono">0:00</span>
+          <span id="miniDur" class="mono">0:00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const JSON_URL = "./episodes.json";
+
+  const LS = {
+    PROGRESS: "sr_audio_progress_v2",
+    LAST:     "sr_audio_last_v2",
+    THEME:    "sr_theme_v2",
+    HISTORY:  "sr_audio_history_v2"
+  };
+
+  const openListBtn = document.getElementById("openListBtn");
+  const themeBtn = document.getElementById("themeBtn");
+
+  const nowTitleEl = document.getElementById("nowTitle");
+  const nowPillEl  = document.getElementById("nowPill");
+  const nowSubEl   = document.getElementById("nowSub");
+
+  const prevLabelEl = document.getElementById("prevLabel");
+  const nextLabelEl = document.getElementById("nextLabel");
+
+  const audio = document.getElementById("audio");
+  const playBtn = document.getElementById("playBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+
+  const seek = document.getElementById("seek");
+  const tCur = document.getElementById("tCur");
+  const tDur = document.getElementById("tDur");
+
+  const overlay = document.getElementById("overlay");
+  const backdrop = document.getElementById("backdrop");
+  const closeListBtn = document.getElementById("closeListBtn");
+
+  const searchEl = document.getElementById("search");
+  const systemFilterEl = document.getElementById("systemFilter");
+  const tagFilterEl = document.getElementById("tagFilter");
+  const sortByEl = document.getElementById("sortBy");
+  const listEl = document.getElementById("list");
+
+  const miniTitleEl = document.getElementById("miniTitle");
+  const miniPlayBtn = document.getElementById("miniPlay");
+  const miniCloseBtn = document.getElementById("miniClose");
+  const miniSeek = document.getElementById("miniSeek");
+  const miniCur = document.getElementById("miniCur");
+  const miniDur = document.getElementById("miniDur");
+
+  let episodes = [];
+  let activeId = null;
+  let nextId = null;
+  let prevId = null;
+
+  let history = loadJSON(LS.HISTORY, []);
+  const HISTORY_LIMIT = 30;
+
+  let holdTimer = null;
+  let holdInterval = null;
+  let holdStartAt = 0;
+  let saveInterval = null;
+
+  function pad3(n){
+    const x = Math.max(0, Math.floor(Number(n) || 0));
+    return String(x).padStart(3, "0");
+  }
+  function fmtTime(sec){
+    sec = Math.max(0, Math.floor(sec || 0));
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    if (h > 0) return `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    return `${m}:${String(s).padStart(2,"0")}`;
+  }
+  function safeStr(v){ return String(v ?? "").trim(); }
+  function unique(arr){ return Array.from(new Set(arr.filter(Boolean))); }
+  function loadJSON(key, fallback){
+    try{
+      const raw = localStorage.getItem(key);
+      if (!raw) return fallback;
+      return JSON.parse(raw);
+    }catch{ return fallback; }
+  }
+  function saveJSON(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+
+  function getProgress(id){
+    const map = loadJSON(LS.PROGRESS, {});
+    const v = map[id];
+    return (typeof v === "number" && isFinite(v) && v > 0) ? v : 0;
+  }
+  function setProgress(id, seconds){
+    const map = loadJSON(LS.PROGRESS, {});
+    map[id] = seconds;
+    saveJSON(LS.PROGRESS, map);
+  }
+
+  function setLast(id, position){ saveJSON(LS.LAST, { id, position }); }
+  function getLast(){ return loadJSON(LS.LAST, null); }
+
+  function setTheme(theme){
+    document.documentElement.setAttribute("data-theme", theme);
+    document.documentElement.style.colorScheme = (theme === "light") ? "light" : "dark";
+    localStorage.setItem(LS.THEME, theme);
+  }
+  function initTheme(){
+    const saved = localStorage.getItem(LS.THEME);
+    if (saved === "dark" || saved === "light"){ setTheme(saved); return; }
+    const prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+    setTheme(prefersLight ? "light" : "dark");
+  }
+
+  function displayName(ep){
+    const epi = pad3(ep.episodeNumber);
+    return `Epi ${epi} — ${ep.title} • ${ep.system}`;
+  }
+  function displayListTitle(ep){
+    const epi = pad3(ep.episodeNumber);
+    return `Epi ${epi} — ${ep.title}`;
+  }
+
+  function findById(id){ return episodes.find(e => e.id === id) || null; }
+
+  function normalizeEpisode(raw){
+    const id = safeStr(raw.id);
+    const url = safeStr(raw.url);
+    const system = safeStr(raw.system);
+    const title = safeStr(raw.title);
+    const episodeNumber = Number(raw.episodeNumber);
+    const tags = Array.isArray(raw.tags) ? raw.tags.map(safeStr).filter(Boolean) : [];
+    if (!id || !url || !system || !title || !isFinite(episodeNumber)) return null;
+    return { id, url, system, title, episodeNumber, tags };
+  }
+
+  function pushHistory(id){
+    if (!id) return;
+    history.push(id);
+    if (history.length > HISTORY_LIMIT) history = history.slice(-HISTORY_LIMIT);
+    saveJSON(LS.HISTORY, history);
+  }
+
+  function getPreviousFromHistory(currentId){
+    const idx = history.lastIndexOf(currentId);
+    if (idx <= 0) return null;
+    for (let i = idx - 1; i >= 0; i--){
+      if (history[i] !== currentId && findById(history[i])) return history[i];
+    }
+    return null;
+  }
+
+  function countOverlap(a, b){
+    const A = new Set((a || []).map(s => s.toLowerCase()));
+    let n = 0;
+    for (const t of (b || [])){
+      if (A.has(String(t).toLowerCase())) n++;
+    }
+    return n;
+  }
+  function weightedRandom(items){
+    const weights = items.map(x => Math.max(1, Math.floor(x.score + 10)));
+    const total = weights.reduce((s,v)=>s+v,0);
+    if (total <= 0) return null;
+    let r = Math.random() * total;
+    for (let i=0; i<items.length; i++){
+      r -= weights[i];
+      if (r <= 0) return items[i].id;
+    }
+    return items[items.length - 1]?.id || null;
+  }
+  function pickSmartRandomNext(cur){
+    const recentSet = new Set(history.slice(-10));
+    const candidates = episodes.filter(e => e.id !== cur.id);
+    const scored = candidates.map(e => {
+      let score = 0;
+      if (e.system === cur.system) score += 30;
+      const overlap = countOverlap(cur.tags, e.tags);
+      if (overlap >= 2) score += 20;
+      else if (overlap === 1) score += 10;
+      if (recentSet.has(e.id)) score -= 50;
+      if (e.system === cur.system){
+        const dist = Math.abs(e.episodeNumber - cur.episodeNumber);
+        score += Math.max(0, 8 - dist);
+      }
+      return { id: e.id, score };
+    });
+
+    const pool1 = scored.filter(x => x.score > 0);
+    const pool2 = scored.filter(x => !recentSet.has(x.id));
+    const pool = pool1.length ? pool1 : (pool2.length ? pool2 : scored);
+    return weightedRandom(pool) || null;
+  }
+
+  function computePrevNext(){
+    const cur = findById(activeId);
+    if (!cur){
+      prevId = null; nextId = null;
+      prevLabelEl.textContent = "—";
+      nextLabelEl.textContent = "—";
+      return;
+    }
+
+    prevId = getPreviousFromHistory(activeId);
+
+    const sequential = episodes
+      .filter(e => e.system === cur.system)
+      .find(e => e.episodeNumber === cur.episodeNumber + 1);
+
+    nextId = sequential ? sequential.id : pickSmartRandomNext(cur);
+
+    prevLabelEl.textContent = prevId ? displayListTitle(findById(prevId)) : "—";
+    nextLabelEl.textContent = nextId ? displayListTitle(findById(nextId)) : "—";
+  }
+
+  function setPlayButtonState(){
+    const playing = !audio.paused && !audio.ended && audio.src;
+    playBtn.textContent = playing ? "⏸" : "▶";
+    miniPlayBtn.textContent = playing ? "⏸" : "▶";
+    nowPillEl.textContent = playing ? "Playing" : (audio.src ? "Paused" : "Ready");
+  }
+
+  function enableSeeking(enabled){
+    seek.disabled = !enabled;
+    miniSeek.disabled = !enabled;
+  }
+
+  function setSeekUIFromAudio(){
+    const dur = audio.duration;
+    const cur = audio.currentTime || 0;
+
+    const hasMeta = isFinite(dur) && dur > 0;
+    enableSeeking(hasMeta);
+
+    tCur.textContent = fmtTime(cur);
+    miniCur.textContent = fmtTime(cur);
+
+    tDur.textContent = hasMeta ? fmtTime(dur) : "0:00";
+    miniDur.textContent = hasMeta ? fmtTime(dur) : "0:00";
+
+    if (hasMeta){
+      const v = Math.floor((cur / dur) * 1000);
+      const clamped = String(Math.max(0, Math.min(1000, v)));
+      seek.value = clamped;
+      miniSeek.value = clamped;
+    } else {
+      seek.value = "0";
+      miniSeek.value = "0";
+    }
+  }
+
+  function startAutosave(){
+    stopAutosave();
+    saveInterval = setInterval(() => {
+      if (!activeId || !audio.src || audio.paused) return;
+      if (!isFinite(audio.currentTime)) return;
+      const t = audio.currentTime;
+      if (t > 0) setProgress(activeId, t);
+      setLast(activeId, t);
+    }, 3000);
+  }
+  function stopAutosave(){
+    if (saveInterval){
+      clearInterval(saveInterval);
+      saveInterval = null;
+    }
+  }
+
+  async function loadEpisode(id, { autoPlay = false, seekToSaved = true } = {}){
+    const ep = findById(id);
+    if (!ep) return;
+
+    activeId = ep.id;
+    audio.src = ep.url;
+    audio.load();
+
+    nowTitleEl.textContent = displayName(ep);
+    nowSubEl.textContent = "";
+    nowPillEl.textContent = "Ready";
+    miniTitleEl.textContent = displayName(ep);
+    setPlayButtonState();
+    setSeekUIFromAudio();
+
+    pushHistory(ep.id);
+    computePrevNext();
+
+    audio.onloadedmetadata = () => {
+      const dur = audio.duration;
+      if (seekToSaved){
+        const saved = getProgress(ep.id);
+        if (saved > 0 && isFinite(dur) && saved < dur - 0.5){
+          audio.currentTime = saved;
+        }
+      }
+      setSeekUIFromAudio();
+      setLast(ep.id, audio.currentTime || 0);
+      setPlayButtonState();
+      if (autoPlay) audio.play().catch(()=>{});
+    };
+  }
+
+  function togglePlay(){
+    if (!audio.src){ openList(); return; }
+    if (audio.paused) audio.play().catch(()=>{});
+    else audio.pause();
+  }
+
+  function playNextTrack(){
+    if (!activeId){ openList(); return; }
+    if (nextId) loadEpisode(nextId, { autoPlay: true, seekToSaved: true });
+  }
+
+  function playPrevTrack(){
+    if (!activeId){ openList(); return; }
+    if (prevId){
+      loadEpisode(prevId, { autoPlay: true, seekToSaved: true });
+      return;
+    }
+    const cur = findById(activeId);
+    if (!cur) return;
+    const prevSeq = episodes
+      .filter(e => e.system === cur.system)
+      .find(e => e.episodeNumber === cur.episodeNumber - 1);
+    if (prevSeq) loadEpisode(prevSeq.id, { autoPlay: true, seekToSaved: true });
+  }
+
+  function seekBy(seconds){
+    if (!audio.src) return;
+    if (!isFinite(audio.duration) || audio.duration <= 0) return;
+    const next = Math.max(0, Math.min(audio.duration, (audio.currentTime || 0) + seconds));
+    audio.currentTime = next;
+    if (activeId){
+      setProgress(activeId, next);
+      setLast(activeId, next);
+    }
+    setSeekUIFromAudio();
+  }
+
+  function holdStepSeconds(elapsedMs){
+    if (elapsedMs < 1000) return 10;
+    if (elapsedMs < 2000) return 20;
+    if (elapsedMs < 3500) return 30;
+    return 60;
+  }
+
+  function startHold(direction){
+    if (!audio.src) return;
+    clearHold();
+    holdStartAt = performance.now();
+    holdTimer = setTimeout(() => {
+      holdInterval = setInterval(() => {
+        const elapsed = performance.now() - holdStartAt;
+        const step = holdStepSeconds(elapsed);
+        seekBy(step * direction);
+      }, 250);
+    }, 350);
+  }
+
+  function clearHold(){
+    if (holdTimer){ clearTimeout(holdTimer); holdTimer = null; }
+    if (holdInterval){ clearInterval(holdInterval); holdInterval = null; }
+  }
+
+  function openList(){
+    overlay.classList.add("show");
+    overlay.setAttribute("aria-hidden", "false");
+    setPlayButtonState();
+    setSeekUIFromAudio();
+    // No auto-focus on search (prevents keyboard popping up)
+  }
+  function closeList(){
+    overlay.classList.remove("show");
+    overlay.setAttribute("aria-hidden", "true");
+  }
+
+  function buildFilters(){
+    const systems = unique(episodes.map(e => e.system)).sort((a,b)=>a.localeCompare(b));
+    systemFilterEl.innerHTML =
+      `<option value="">All systems</option>` +
+      systems.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join("");
+
+    const tags = unique(episodes.flatMap(e => e.tags || [])).sort((a,b)=>a.localeCompare(b));
+    tagFilterEl.innerHTML =
+      `<option value="">All tags</option>` +
+      tags.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("");
+  }
+
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function matches(ep, q, system, tag){
+    if (system && ep.system !== system) return false;
+    if (tag && !(ep.tags || []).includes(tag)) return false;
+    if (!q) return true;
+
+    const blob = [
+      ep.title,
+      ep.system,
+      `epi ${pad3(ep.episodeNumber)}`,
+      (ep.tags || []).join(" "),
+      ep.id
+    ].join(" ").toLowerCase();
+
+    return blob.includes(q);
+  }
+
+  function sortEpisodes(list, sortBy){
+    const arr = [...list];
+    if (sortBy === "episode"){
+      arr.sort((a,b) => {
+        if (a.system !== b.system) return a.system.localeCompare(b.system);
+        return a.episodeNumber - b.episodeNumber;
+      });
+      return arr;
+    }
+    if (sortBy === "name"){
+      arr.sort((a,b) => {
+        const at = a.title.localeCompare(b.title);
+        if (at !== 0) return at;
+        return a.episodeNumber - b.episodeNumber;
+      });
+      return arr;
+    }
+    if (sortBy === "system"){
+      arr.sort((a,b) => {
+        const s = a.system.localeCompare(b.system);
+        if (s !== 0) return s;
+        return a.episodeNumber - b.episodeNumber;
+      });
+      return arr;
+    }
+    if (sortBy === "tag"){
+      const firstTag = (e) => (e.tags && e.tags.length) ? [...e.tags].sort((x,y)=>x.localeCompare(y))[0] : "";
+      arr.sort((a,b) => {
+        const t = firstTag(a).localeCompare(firstTag(b));
+        if (t !== 0) return t;
+        const s = a.system.localeCompare(b.system);
+        if (s !== 0) return s;
+        return a.episodeNumber - b.episodeNumber;
+      });
+      return arr;
+    }
+    return arr;
+  }
+
+  function renderList(){
+    const q = searchEl.value.trim().toLowerCase();
+    const system = systemFilterEl.value || "";
+    const tag = tagFilterEl.value || "";
+    const sortBy = sortByEl.value || "episode";
+
+    const filtered = episodes.filter(ep => matches(ep, q, system, tag));
+    const sorted = sortEpisodes(filtered, sortBy);
+
+    listEl.innerHTML = "";
+    if (!sorted.length){
+      const empty = document.createElement("div");
+      empty.className = "item";
+      empty.style.cursor = "default";
+      empty.innerHTML = `<div class="itemTitle">No matches</div><div class="itemMeta">Clear filters</div>`;
+      listEl.appendChild(empty);
+      return;
+    }
+
+    for (const ep of sorted){
+      const saved = getProgress(ep.id);
+      const hasSaved = saved > 3;
+      const isActive = (ep.id === activeId);
+
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <div class="itemTitle">${escapeHtml(displayListTitle(ep))}</div>
+        <div class="itemMeta">
+          ${hasSaved ? `<span class="pillInList">Continue ${escapeHtml(fmtTime(saved))}</span>` : ``}
+          ${isActive ? `<span class="pillInList">Now</span>` : ``}
+        </div>
+      `;
+      div.addEventListener("click", () => {
+        loadEpisode(ep.id, { autoPlay: true, seekToSaved: true });
+      });
+      listEl.appendChild(div);
+    }
+  }
+
+  function wireEvents(){
+    openListBtn.addEventListener("click", openList);
+    closeListBtn.addEventListener("click", closeList);
+    miniCloseBtn.addEventListener("click", closeList);
+    backdrop.addEventListener("click", closeList);
+
+    themeBtn.addEventListener("click", () => {
+      const cur = document.documentElement.getAttribute("data-theme") || "dark";
+      setTheme(cur === "dark" ? "light" : "dark");
+    });
+
+    searchEl.addEventListener("input", renderList);
+    systemFilterEl.addEventListener("change", renderList);
+    tagFilterEl.addEventListener("change", renderList);
+    sortByEl.addEventListener("change", renderList);
+
+    playBtn.addEventListener("click", togglePlay);
+    miniPlayBtn.addEventListener("click", togglePlay);
+
+    prevBtn.addEventListener("click", playPrevTrack);
+    nextBtn.addEventListener("click", playNextTrack);
+
+    const setupHold = (btn, direction) => {
+      btn.addEventListener("pointerdown", (e) => {
+        try { btn.setPointerCapture(e.pointerId); } catch {}
+        startHold(direction);
+      });
+      const end = () => clearHold();
+      btn.addEventListener("pointerup", end);
+      btn.addEventListener("pointercancel", end);
+      btn.addEventListener("pointerleave", end);
+    };
+    setupHold(prevBtn, -1);
+    setupHold(nextBtn, +1);
+
+    const seekTo = (val) => {
+      if (!audio.src) return;
+      const dur = audio.duration;
+      if (!isFinite(dur) || dur <= 0) return;
+      const frac = Math.max(0, Math.min(1, Number(val) / 1000));
+      const t = dur * frac;
+      audio.currentTime = t;
+      if (activeId){
+        setProgress(activeId, t);
+        setLast(activeId, t);
+      }
+      setSeekUIFromAudio();
+    };
+    seek.addEventListener("input", () => seekTo(seek.value));
+    miniSeek.addEventListener("input", () => seekTo(miniSeek.value));
+
+    audio.addEventListener("play", () => { setPlayButtonState(); startAutosave(); });
+    audio.addEventListener("pause", () => {
+      setPlayButtonState();
+      stopAutosave();
+      if (activeId && isFinite(audio.currentTime)){
+        setProgress(activeId, audio.currentTime);
+        setLast(activeId, audio.currentTime);
+      }
+      renderList();
+    });
+    audio.addEventListener("timeupdate", () => setSeekUIFromAudio());
+    audio.addEventListener("ended", () => {
+      setPlayButtonState();
+      stopAutosave();
+      if (activeId) setProgress(activeId, 0);
+      renderList();
+      nowPillEl.textContent = "Finished";
+    });
+  }
+
+  async function init(){
+    initTheme();
+    wireEvents();
+
+    try{
+      const res = await fetch(JSON_URL, { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      if (!Array.isArray(json)) throw new Error("episodes.json must be a JSON array");
+
+      episodes = json.map(normalizeEpisode).filter(Boolean);
+      if (!episodes.length) throw new Error("No valid episodes found.");
+
+      buildFilters();
+      renderList();
+
+      const last = getLast();
+      if (last && last.id && findById(last.id)){
+        if (typeof last.position === "number" && isFinite(last.position) && last.position > 0){
+          setProgress(last.id, last.position);
+        }
+        await loadEpisode(last.id, { autoPlay: false, seekToSaved: true });
+        audio.pause();
+        setPlayButtonState();
+        nowPillEl.textContent = "Ready";
+      }
+    } catch (err){
+      console.error(err);
+      nowTitleEl.textContent = "Pick an episode from the list";
+      nowPillEl.textContent = "Ready";
+      prevLabelEl.textContent = "—";
+      nextLabelEl.textContent = "—";
+    }
+  }
+
+  init();
+})();
+</script>
+
+</body>
+</html>
