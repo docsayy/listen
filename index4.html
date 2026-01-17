@@ -606,6 +606,7 @@
           <select id="tagFilter" title="Tag filter">
             <option value="">All tags</option>
           </select>
+          <!-- REMOVED: third dropdown (sortBy) -->
         </div>
       </div>
 
@@ -697,7 +698,7 @@ Listenify is audio player who made it for myself and for others who want to list
   const searchEl = document.getElementById("search");
   const systemFilterEl = document.getElementById("systemFilter");
   const tagFilterEl = document.getElementById("tagFilter");
-  const sortByEl = document.getElementById("sortBy");
+  // REMOVED: sortByEl (third dropdown removed)
   const listEl = document.getElementById("list");
 
   const miniTitleEl = document.getElementById("miniTitle");
@@ -931,7 +932,6 @@ Listenify is audio player who made it for myself and for others who want to list
   }
 
   function updateSpeedUI(){
-    // show integers as "1×", decimals as "1.25×"
     const text = (Math.abs(speed - Math.round(speed)) < 1e-9)
       ? `${Math.round(speed)}×`
       : `${speed}×`;
@@ -945,7 +945,6 @@ Listenify is audio player who made it for myself and for others who want to list
   }
 
   function cycleSpeed(){
-    // cycles through: 1.25 → 1.5 → 1.75 → 2 → 2.5 → (back to 1.25)
     const idx = SPEEDS.findIndex(x => Math.abs(x - speed) < 1e-9);
     speed = SPEEDS[(idx + 1 + SPEEDS.length) % SPEEDS.length];
     applySpeed();
@@ -965,11 +964,11 @@ Listenify is audio player who made it for myself and for others who want to list
     audio.load();
 
     nowTitleEl.textContent = displayName(ep);
-    nowSubEl.textContent = ""; // no extra metadata
+    nowSubEl.textContent = "";
     nowPillEl.textContent = "Ready";
     miniTitleEl.textContent = displayName(ep);
 
-    applySpeed(); // ensure speed persists per track
+    applySpeed();
 
     setPlayButtonState();
     setSeekUIFromAudio();
@@ -1059,7 +1058,6 @@ Listenify is audio player who made it for myself and for others who want to list
     overlay.setAttribute("aria-hidden", "false");
     setPlayButtonState();
     setSeekUIFromAudio();
-    // no auto-focus on search
   }
   function closeList(){
     overlay.classList.remove("show");
@@ -1112,53 +1110,17 @@ Listenify is audio player who made it for myself and for others who want to list
     return blob.includes(q);
   }
 
-  function sortEpisodes(list, sortBy){
-    const arr = [...list];
-    if (sortBy === "episode"){
-      arr.sort((a,b) => {
-        if (a.system !== b.system) return a.system.localeCompare(b.system);
-        return a.episodeNumber - b.episodeNumber;
-      });
-      return arr;
-    }
-    if (sortBy === "name"){
-      arr.sort((a,b) => {
-        const at = a.title.localeCompare(b.title);
-        if (at !== 0) return at;
-        return a.episodeNumber - b.episodeNumber;
-      });
-      return arr;
-    }
-    if (sortBy === "system"){
-      arr.sort((a,b) => {
-        const s = a.system.localeCompare(b.system);
-        if (s !== 0) return s;
-        return a.episodeNumber - b.episodeNumber;
-      });
-      return arr;
-    }
-    if (sortBy === "tag"){
-      const firstTag = (e) => (e.tags && e.tags.length) ? [...e.tags].sort((x,y)=>x.localeCompare(y))[0] : "";
-      arr.sort((a,b) => {
-        const t = firstTag(a).localeCompare(firstTag(b));
-        if (t !== 0) return t;
-        const s = a.system.localeCompare(b.system);
-        if (s !== 0) return s;
-        return a.episodeNumber - b.episodeNumber;
-      });
-      return arr;
-    }
-    return arr;
-  }
-
+  // Default sort (since third dropdown removed): episode ordering by system then episodeNumber
   function renderList(){
     const q = searchEl.value.trim().toLowerCase();
     const system = systemFilterEl.value || "";
     const tag = tagFilterEl.value || "";
-    const sortBy = sortByEl.value || "episode";
 
     const filtered = episodes.filter(ep => matches(ep, q, system, tag));
-    const sorted = sortEpisodes(filtered, sortBy);
+    const sorted = [...filtered].sort((a,b) => {
+      if (a.system !== b.system) return a.system.localeCompare(b.system);
+      return a.episodeNumber - b.episodeNumber;
+    });
 
     listEl.innerHTML = "";
     if (!sorted.length){
@@ -1192,37 +1154,30 @@ Listenify is audio player who made it for myself and for others who want to list
   }
 
   function wireEvents(){
-    // List open/close
     openListBtn.addEventListener("click", openList);
     closeListBtn.addEventListener("click", closeList);
     miniCloseBtn.addEventListener("click", closeList);
     backdrop.addEventListener("click", closeList);
 
-    // About open/close (player continues running)
     aboutBtn.addEventListener("click", openAbout);
     aboutCloseBtn.addEventListener("click", closeAbout);
     aboutBackdrop.addEventListener("click", closeAbout);
 
-    // Theme toggle
     themeBtn.addEventListener("click", () => {
       const cur = document.documentElement.getAttribute("data-theme") || "dark";
       setTheme(cur === "dark" ? "light" : "dark");
     });
 
-    // Filters
     searchEl.addEventListener("input", renderList);
     systemFilterEl.addEventListener("change", renderList);
     tagFilterEl.addEventListener("change", renderList);
-    sortByEl.addEventListener("change", renderList);
 
-    // Play controls
     playBtn.addEventListener("click", togglePlay);
     miniPlayBtn.addEventListener("click", togglePlay);
 
     prevBtn.addEventListener("click", playPrevTrack);
     nextBtn.addEventListener("click", playNextTrack);
 
-    // Hold seek
     const setupHold = (btn, direction) => {
       btn.addEventListener("pointerdown", (e) => {
         try { btn.setPointerCapture(e.pointerId); } catch {}
@@ -1236,7 +1191,6 @@ Listenify is audio player who made it for myself and for others who want to list
     setupHold(prevBtn, -1);
     setupHold(nextBtn, +1);
 
-    // Scrub seek
     const seekTo = (val) => {
       if (!audio.src) return;
       const dur = audio.duration;
@@ -1253,11 +1207,9 @@ Listenify is audio player who made it for myself and for others who want to list
     seek.addEventListener("input", () => seekTo(seek.value));
     miniSeek.addEventListener("input", () => seekTo(miniSeek.value));
 
-    // Speed buttons
     speedCycleBtn.addEventListener("click", cycleSpeed);
     speedResetBtn.addEventListener("click", resetSpeed);
 
-    // Audio events
     audio.addEventListener("play", () => { setPlayButtonState(); startAutosave(); });
     audio.addEventListener("pause", () => {
       setPlayButtonState();
@@ -1277,7 +1229,6 @@ Listenify is audio player who made it for myself and for others who want to list
       nowPillEl.textContent = "Finished";
     });
 
-    // ESC closes overlays
     window.addEventListener("keydown", (e) => {
       if (e.key !== "Escape") return;
       if (aboutModal.classList.contains("show")) closeAbout();
