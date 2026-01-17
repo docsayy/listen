@@ -359,6 +359,7 @@
       padding-right: 26px;
     }
 
+    /* ✅ UPDATED: fixed-height rows so 1 item won't stretch */
     .list{
       flex: 1 1 auto;
       min-height: 0;
@@ -367,8 +368,12 @@
       display:grid;
       gap: 8px;
       padding-right: 2px;
+
+      grid-auto-rows: 52px; /* fixed row height */
+      align-content: start; /* prevent stretching to fill height */
     }
 
+    /* ✅ UPDATED: match the fixed row height */
     .item{
       border: 1px solid var(--line);
       background: var(--card);
@@ -382,6 +387,8 @@
       user-select:none;
       -webkit-tap-highlight-color: transparent;
       transition: transform .06s ease, background .15s ease;
+
+      height: 52px; /* must match grid-auto-rows */
     }
     .item:hover{ background: color-mix(in oklab, var(--card) 70%, var(--btn) 30%); }
     .item:active{ transform: scale(.995); }
@@ -511,6 +518,9 @@
       select, input[type="search"]{ font-size: 11px; padding: 8px 9px; border-radius: 11px; }
       .itemTitle{ font-size: 11px; }
       .iconBtn{ width: 42px; height: 42px; }
+      /* optional: slightly shorter rows on tiny screens */
+      .list{ grid-auto-rows: 50px; }
+      .item{ height: 50px; }
     }
   </style>
 </head>
